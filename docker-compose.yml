@@ -1,13 +1,13 @@
 version: "1.0"
 services:
-  dev-containers:
+  diplomado-ciencia-datos:
     build:
       context: .
       dockerfile: Dockerfile
     command: "/bin/bash"
     stdin_open: true
     tty: true
-    container_name: dev-containers
+    container_name: diplomado-ciencia-datos
     volumes:
       - .:/workspace
     env_file:

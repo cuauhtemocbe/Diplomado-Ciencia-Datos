@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "dev-container"
+name = "diplomado"
 version = "0.1.0"
-description = "Ambiente para desarrollar proyectos de Ciencia de Datos"
+description = ""
 authors = ["Kuautli <cuauhtemocbe@gmail.com>"]
 readme = "README.md"
 
@@ -12,6 +12,10 @@ ipykernel = "^6.29.4"
 scikit-learn = "^1.4.2"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.21.1"
+beautifulsoup4 = "^4.12.3"
+seaborn = "^0.13.2"
+cufflinks = "^0.17.3"
+nbformat = "^5.10.4"
 
 
 [build-system]
