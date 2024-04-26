@@ -1,4 +1,4 @@
-version: "1.0"
+version: "3.9"
 services:
   diplomado-ciencia-datos:
     build:
@@ -8,6 +8,8 @@ services:
     stdin_open: true
     tty: true
     container_name: diplomado-ciencia-datos
+    ports:
+      - "8888:8888"
     volumes:
       - .:/workspace
     env_file:
