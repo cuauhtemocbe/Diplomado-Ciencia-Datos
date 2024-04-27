@@ -32,8 +32,9 @@ Si prefieres usar Visual Studio Code para desarrollar o ejecutar los notebooks, 
 1. Abre Visual Studio Code y selecciona `File > Open Folder`. Luego elige la carpeta **Diplomado-Ciencia-Datos** para abrir el repositorio.
 2. Instala la extensión **Dev Containers** desde el Marketplace de VSC.
 3. Abre la Paleta de Comandos (Command Palette) con `Shift + Ctrl + P` y escribe `Dev Containers: Rebuild and Reopen in Container`. Ejecútalo para construir y levantar el contenedor Docker.
-4. En el explorador de archivos (`Ctrl + Shift + E`), navega hasta la carpeta `notebooks` y abre el archivo `0. Validar-ambiente.ipynb`.
-5. Ejecuta el notebook; al inicio te solicitará seleccionar un kernel, elige Python 3.10.11.
+4. En el explorador de archivos (`Ctrl + Shift + E`), navega hasta la carpeta `notebooks` y abre el archivo `0-Hello-Pandas.ipynb`.
+5. Ejecuta la primer celda; al inicio te solicitará seleccionar un kernel, elige Python 3.10.11.
+6. Disfruta
 
 ### Configuración con Jupyter Lab (Opción Sencilla)
 
@@ -57,7 +58,11 @@ Si prefieres utilizar Jupyter Lab con Docker, sigue estos pasos:
     jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=''
     ```
 
-4. Finalmente, abre el siguiente enlace en tu navegador: [http://localhost:8888/lab/tree/notebooks](http://localhost:8888/lab/tree/notebooks)
+4. Abre el siguiente enlace en tu navegador: [http://localhost:8888/lab/tree/notebooks](http://localhost:8888/lab/tree/notebooks)
+
+5. Navega en el explorador a la carpeta notebooks, y abre prueba el notebook `0-Hello-Pandas.ipynb`.
+
+6. Disfruta.
 
 ## Enlaces de Interés
 
