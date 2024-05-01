@@ -25,6 +25,8 @@ La instalación de Visual Studio Code es opcional, pero se recomienda especialme
     ```
     Este comando creará una carpeta llamada **Diplomado-Ciencia-Datos** en tu máquina.
 
+2. ⚠️**Importante :⚠️** Crear un archivo `.env` dentro de la carpeta **DataScience-Docker**
+
 ### Configuración con Visual Studio Code (Opción Avanzada)
 
 Si prefieres usar Visual Studio Code para desarrollar o ejecutar los notebooks, sigue estos pasos:
