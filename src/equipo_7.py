@@ -31,6 +31,10 @@ def check_time_format(time_str, format='%m/%d/%Y'):
         return False
 
 class DataViz:
+  """
+    Una clase para la visualización de datos que proporciona métodos estáticos para analizar y visualizar
+    información contenida en un DataFrame de pandas.
+    """
 
   @staticmethod
   def completitud(data):
@@ -80,6 +84,7 @@ class DataViz:
       sns.boxplot(data=data, x=column, ax=axs).set(title=column)
       plt.tight_layout()
       plt.show()
+
   @staticmethod
   def barras_horizontales(data: pd.DataFrame, columnas: list) -> None:
     """
@@ -311,3 +316,5 @@ def get_varclushi(data):
     vc.varclus()
 
     return vc.info, vc.rsquare
+
+
