@@ -8,7 +8,11 @@ Los desarrolladores son:
   Tadeo Trejo Miguel Angel
   Cuauhtémoc Salvador Bautista Enciso
   Tamayo Guerrero Brandon
+
 """
+
+__version__ = "1.0.0"
+
 import pandas as pd
 from datetime import datetime
 import matplotlib.pyplot as plt
@@ -18,17 +22,6 @@ from sklearn.feature_selection import SelectKBest, f_regression, f_classif
 from sklearn.decomposition import PCA
 from varclushi import VarClusHi
 
-
-pd.set_option('display.max_columns', None)
-
-
-
-def check_time_format(time_str, format='%m/%d/%Y'):
-    try:
-        datetime.strptime(str(time_str), format)
-        return True
-    except ValueError:
-        return False
 
 class DataViz:
   """
@@ -201,6 +194,14 @@ class DataViz:
       sns.heatmap(data = correl)
       plt.tight_layout()
       plt.show()
+
+
+def check_time_format(time_str, format='%m/%d/%Y'):
+    try:
+        datetime.strptime(str(time_str), format)
+        return True
+    except ValueError:
+        return False
 
 
 def detect_outliers_iqr(data, column):
