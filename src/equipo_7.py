@@ -302,7 +302,9 @@ def get_kbest(data_features, data_target, k):
 
 def get_varclushi(data):
     """
-    Realiza un análisis de clusters de variables (Variable Clustering) en los datos proporcionados.
+    Esta función utiliza la librería VarClusHi para realizar un análisis de clusters de variables en los datos proporcionados.
+    Calcula la información detallada sobre los clusters de variables y los valores de R-cuadrado para cada variable en relación a su cluster.
+    Además, selecciona las mejores características (variables) basadas en el análisis de clusters.
 
     Parámetros:
     data (pd.DataFrame o np.ndarray): Los datos de entrada sobre los que se realizará el análisis de clusters de variables.
@@ -311,10 +313,19 @@ def get_varclushi(data):
     tuple: Una tupla que contiene:
         - info (pd.DataFrame): Un DataFrame de pandas con información detallada sobre los clusters de variables.
         - rsquare (pd.DataFrame): Un DataFrame de pandas con los valores de R-cuadrado para cada variable en relación a su cluster.
+        - best_features (pd.Series): Una serie pandas que contiene las mejores características (variables) seleccionadas basadas en el análisis de clusters.
+
+    Ejemplo:
+    >>> info, rsquare, best_features = get_varclushi(data)
     """
     vc = VarClusHi(data)
     vc.varclus()
 
-    return vc.info, vc.rsquare
+    vc_info = vc.info
+    vc_rsquare_df = vc.rsquare
+
+    best_features = vc_rsquare_df.sort_values(by=['Cluster','RS_Ratio'],ascending= False).groupby('Cluster').first()['Variable']
+
+    return vc_info, vc_rsquare_df, best_features
 
 
