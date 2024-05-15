@@ -329,3 +329,39 @@ def get_varclushi(data):
     return vc_info, vc_rsquare_df, best_features
 
 
+def get_information_value(df, var, tgt):
+    """
+    Calcula el Valor de Información (IV) de una variable en un DataFrame con respecto a una variable objetivo.
+
+    Parámetros:
+    - df (DataFrame): El DataFrame que contiene las variables de interés.
+    - var (str): El nombre de la variable para la cual se calculará el IV.
+    - tgt (str): El nombre de la variable objetivo.
+
+    Retorna:
+    - float: El Valor de Información (IV) de la variable especificada con respecto a la variable objetivo.
+
+    Ejemplo:
+    >>> IV(df, 'variable', 'objetivo')
+    0.1234
+    """
+    # Agrupar el DataFrame por la variable de interés y calcular las frecuencias y sumas
+    aux = df[[var, tgt]].groupby(var).agg(["count", "sum"])
+
+    # Calcular el número de eventos y no eventos para cada categoría de la variable de interés
+    aux["evento"] = aux[tgt, "sum"]
+    aux["no_evento"] = aux[tgt, "count"] - aux[tgt, "sum"]
+
+    # Calcular la proporción de eventos y no eventos para cada categoría
+    aux["%evento"] = aux["evento"] / aux["evento"].sum()
+    aux["%no_evento"] = aux["no_evento"] / aux["no_evento"].sum()
+
+    # Calcular el Weight of Evidence (WOE) para cada categoría
+    aux["WOE"] = np.log(aux["%no_evento"] / aux["%evento"])
+
+    # Calcular el IV para cada categoría
+    aux["IV"] = (aux["%no_evento"] - aux["%evento"]) * aux["WOE"]
+
+    # Sumar todos los IVs de las categorías para obtener el IV total de la variable
+    return aux["IV"].sum()
+
