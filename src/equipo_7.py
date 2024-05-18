@@ -39,7 +39,10 @@ class DataViz:
     Presenta el % de valores nulos que contiene cada columna del dataframe.  
     """
 
-    return data.isnull().sum()/len(data)
+    count_df = round((data.isnull().sum() / len(data)).to_frame(), 2)
+    count_df = count_df.rename(columns={0: "% valores nulos"})
+
+    return count_df
 
   @staticmethod
   def histograma(data: pd.DataFrame, columnas: list) -> None:
