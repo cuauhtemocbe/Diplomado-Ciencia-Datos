@@ -1,17 +1,9 @@
 """
 El modulo sirve para analizar la completitud de un conjunto de datos y 
 realizar gráficas por tipo de variable (Discretas y continuas)
-
-Los desarrolladores son:
-  Alfaro Segura Vanessa Paola
-  Izumi Sierra Saemi Marissa
-  Tadeo Trejo Miguel Angel
-  Cuauhtémoc Salvador Bautista Enciso
-  Tamayo Guerrero Brandon
-
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 import pandas as pd
 from datetime import datetime
@@ -377,3 +369,32 @@ def get_information_value(df, var, tgt):
     # Sumar todos los IVs de las categorías para obtener el IV total de la variable
     return aux["IV"].sum()
 
+
+def count_percentage(df, columna):
+    # Realizar el conteo de valores en la columna especificada
+    conteo = df[columna].value_counts().reset_index()
+    conteo.columns = [columna, 'conteo']
+    
+    # Calcular los porcentajes
+    total = conteo['conteo'].sum()
+    conteo['porcentaje'] = round((conteo['conteo'] / total) * 100, 2)
+    
+    return conteo
+
+
+def create_feature_dataframe(data, column):
+    feature = data.columns[0]
+    category = data.at[0, column]
+    conteo = data.at[0, 'conteo']
+    porcentaje = data.at[0, 'porcentaje']
+    
+    # Constructing the final dictionary
+    variable = {
+        'feature': feature, 
+        'category': category,
+        'conteo': conteo,
+        'porcentaje': porcentaje
+    }
+    
+    # Converting the dictionary to a DataFrame
+    return pd.DataFrame([variable])
