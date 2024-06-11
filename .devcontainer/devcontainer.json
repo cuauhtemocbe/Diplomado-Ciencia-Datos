@@ -40,7 +40,8 @@
 				"ms-python.python",
 				"ms-python.debugpy",
 				"ms-toolsai.jupyter",
-				"tamasfe.even-better-toml"
+				"tamasfe.even-better-toml",
+				"ms-python.black-formatter"
 			]
 		}
 	}
