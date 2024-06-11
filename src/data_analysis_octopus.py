@@ -16,190 +16,192 @@ from varclushi import VarClusHi
 
 
 class DataViz:
-  """
+    """
     Una clase para la visualización de datos que proporciona métodos estáticos para analizar y visualizar
     información contenida en un DataFrame de pandas.
     """
 
-  @staticmethod
-  def completitud(data):
-    """
-    Función que presenta la proporcion de valores nulos que tiene cada columna.
-    Parámetros:
-    data (pd.DataFrame): El DataFrame que contiene los datos.
-    Retorna:
-    Presenta el % de valores nulos que contiene cada columna del dataframe.  
-    """
+    @staticmethod
+    def completitud(data):
+        """
+        Función que presenta la proporcion de valores nulos que tiene cada columna.
+        Parámetros:
+        data (pd.DataFrame): El DataFrame que contiene los datos.
+        Retorna:
+        Presenta el % de valores nulos que contiene cada columna del dataframe.
+        """
 
-    # Calcular el porcentaje de valores nulos
-    null_percent = round((data.isnull().sum() / len(data) * 100).to_frame(), 2)
-    null_percent = null_percent.rename(columns={0: "% valores nulos"})
+        # Calcular el porcentaje de valores nulos
+        null_percent = round((data.isnull().sum() / len(data) * 100).to_frame(), 2)
+        null_percent = null_percent.rename(columns={0: "% valores nulos"})
 
-    # Calcular el conteo de valores no nulos
-    count_nulls = data.isnull().sum().to_frame()
-    count_nulls = count_nulls.rename(columns={0: "Total de nulos"})
+        # Calcular el conteo de valores no nulos
+        count_nulls = data.isnull().sum().to_frame()
+        count_nulls = count_nulls.rename(columns={0: "Total de nulos"})
 
-    # Concatenar los resultados
-    result_df = pd.concat([count_nulls, null_percent], axis=1)
+        # Concatenar los resultados
+        result_df = pd.concat([count_nulls, null_percent], axis=1)
 
-    return result_df
+        return result_df
 
-  @staticmethod
-  def histograma(data: pd.DataFrame, columnas: list) -> None:
-    """
-      Genera histogramas para las columnas especificadas de un DataFrame.
+    @staticmethod
+    def histograma(data: pd.DataFrame, columnas: list) -> None:
+        """
+        Genera histogramas para las columnas especificadas de un DataFrame.
 
-      Parámetros:
-      data (pd.DataFrame): El DataFrame que contiene los datos.
-      columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
+        Parámetros:
+        data (pd.DataFrame): El DataFrame que contiene los datos.
+        columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
 
-      Retorna:
-      Visualiza el gráfico de cada columna del argumento columnas
-      """
-    for column  in columnas:
-      fig, axs = plt.subplots(1, 1, figsize=(15, 5))
-      sns.histplot(data.groupby(column)[column].count(), ax=axs).set_title(column)
-      plt.tight_layout()
-      plt.show()
-
-  @staticmethod
-  def caja(data: pd.DataFrame, columnas: list) -> None:
-    """
-
-      Genera diagramas de caja y bigotes para las columnas especificadas de un DataFrame.
-
-      Parámetros:
-      data (pd.DataFrame): El DataFrame que contiene los datos.
-      columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
-
-      Retorna:
-      Visualiza el gráfico de cada columna del argumento columnas
-      """
-    for column  in columnas:
-      fig, axs = plt.subplots(1, 1, figsize=(15, 5))
-      sns.boxplot(data=data, x=column, ax=axs).set(title=column)
-      plt.tight_layout()
-      plt.show()
-
-  @staticmethod
-  def barras_horizontales(data: pd.DataFrame, columnas: list) -> None:
-    """
-    Genera un gráfico de barras horizontales para las columnas especificadas de un DataFrame.
-
-    Parámetros:
-    data (pd.DataFrame): El DataFrame que contiene los datos.
-    columnas (list): Una lista de nombres de columnas discretas para las cuales se generarán los gráficos.
-
-    Retorna:
-    Visualiza el gráfico de cada columna del argumento columnas
-    """
-
-    for column  in columnas:
-      fig, axs = plt.subplots(1, 1, figsize=(15, 5))
-      sns.barplot(data.groupby(column)[column].count(), ax=axs, orient='h').set_title(column)
-      plt.tight_layout()
-      plt.show()
-
-  @staticmethod
-  def lineas(data: pd.DataFrame, columnas: list, fecha: str) -> None:
-      """
-      Genera un gráfico de lineas para las columnas especificadas de un DataFrame.
-
-      Parámetros:
-      data (pd.DataFrame): El DataFrame que contiene los datos.
-      columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
-      fecha (str): Es la columna que contiene la fecha de tipo datetime
-
-      Retorna:
-      Visualiza el gráfico de cada columna del argumento columnas
-      """
-
-      for column  in columnas:
-          fig, axs = plt.subplots(1, 1, figsize=(15, 5))
-          sns.lineplot(x=fecha , y=column, data=data, marker="o")
-          plt.xticks(rotation=45)
-          plt.tight_layout()
-          plt.show()
-
-  @staticmethod
-  def puntos(data: pd.DataFrame, columnas: list) -> None:
-      """
-      Genera un gráfico de puntos para todos los pares ordenados de las columnas especificadas de un DataFrame,
-      exceptuando los pares cuyos atributos sean el mismo.
-
-      Parámetros:
-      data (pd.DataFrame): El DataFrame que contiene los datos.
-      columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
-
-      Retorna:
-      Visualiza el gráfico de cada par ordenado argumento columnas
-      """
-      for column_a in columnas:
-        for column_b in columnas:
-            if column_a == column_b:
-              continue
+        Retorna:
+        Visualiza el gráfico de cada columna del argumento columnas
+        """
+        for column in columnas:
             fig, axs = plt.subplots(1, 1, figsize=(15, 5))
-            sns.scatterplot(data=data, x= column_a, y= column_b)
+            sns.histplot(data.groupby(column)[column].count(), ax=axs).set_title(column)
             plt.tight_layout()
             plt.show()
 
-  @staticmethod
-  def densidad(data: pd.DataFrame, columnas: list) -> None:
-      """
-      Genera un gráfico de densidad de las columnas especificadas de un DataFrame,
+    @staticmethod
+    def caja(data: pd.DataFrame, columnas: list) -> None:
+        """
 
-      Parámetros:
-      data (pd.DataFrame): El DataFrame que contiene los datos.
-      columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
+        Genera diagramas de caja y bigotes para las columnas especificadas de un DataFrame.
 
-      Retorna:
-      Visualiza el gráfico de cada columna del argumento columnas
-      """
-      for column in columnas:
+        Parámetros:
+        data (pd.DataFrame): El DataFrame que contiene los datos.
+        columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
+
+        Retorna:
+        Visualiza el gráfico de cada columna del argumento columnas
+        """
+        for column in columnas:
+            fig, axs = plt.subplots(1, 1, figsize=(15, 5))
+            sns.boxplot(data=data, x=column, ax=axs).set(title=column)
+            plt.tight_layout()
+            plt.show()
+
+    @staticmethod
+    def barras_horizontales(data: pd.DataFrame, columnas: list) -> None:
+        """
+        Genera un gráfico de barras horizontales para las columnas especificadas de un DataFrame.
+
+        Parámetros:
+        data (pd.DataFrame): El DataFrame que contiene los datos.
+        columnas (list): Una lista de nombres de columnas discretas para las cuales se generarán los gráficos.
+
+        Retorna:
+        Visualiza el gráfico de cada columna del argumento columnas
+        """
+
+        for column in columnas:
+            fig, axs = plt.subplots(1, 1, figsize=(15, 5))
+            sns.barplot(
+                data.groupby(column)[column].count(), ax=axs, orient="h"
+            ).set_title(column)
+            plt.tight_layout()
+            plt.show()
+
+    @staticmethod
+    def lineas(data: pd.DataFrame, columnas: list, fecha: str) -> None:
+        """
+        Genera un gráfico de lineas para las columnas especificadas de un DataFrame.
+
+        Parámetros:
+        data (pd.DataFrame): El DataFrame que contiene los datos.
+        columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
+        fecha (str): Es la columna que contiene la fecha de tipo datetime
+
+        Retorna:
+        Visualiza el gráfico de cada columna del argumento columnas
+        """
+
+        for column in columnas:
+            fig, axs = plt.subplots(1, 1, figsize=(15, 5))
+            sns.lineplot(x=fecha, y=column, data=data, marker="o")
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+            plt.show()
+
+    @staticmethod
+    def puntos(data: pd.DataFrame, columnas: list) -> None:
+        """
+        Genera un gráfico de puntos para todos los pares ordenados de las columnas especificadas de un DataFrame,
+        exceptuando los pares cuyos atributos sean el mismo.
+
+        Parámetros:
+        data (pd.DataFrame): El DataFrame que contiene los datos.
+        columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
+
+        Retorna:
+        Visualiza el gráfico de cada par ordenado argumento columnas
+        """
+        for column_a in columnas:
+            for column_b in columnas:
+                if column_a == column_b:
+                    continue
+                fig, axs = plt.subplots(1, 1, figsize=(15, 5))
+                sns.scatterplot(data=data, x=column_a, y=column_b)
+                plt.tight_layout()
+                plt.show()
+
+    @staticmethod
+    def densidad(data: pd.DataFrame, columnas: list) -> None:
+        """
+        Genera un gráfico de densidad de las columnas especificadas de un DataFrame,
+
+        Parámetros:
+        data (pd.DataFrame): El DataFrame que contiene los datos.
+        columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
+
+        Retorna:
+        Visualiza el gráfico de cada columna del argumento columnas
+        """
+        for column in columnas:
             fig, axs = plt.subplots(1, 1, figsize=(15, 5))
             sns.kdeplot(data=data, x=column)
             plt.tight_layout()
             plt.show()
 
-  @staticmethod
-  def violin(data: pd.DataFrame, columnas: list) -> None:
-      """
-      Genera un gráfico de violín de las columnas especificadas de un DataFrame,
+    @staticmethod
+    def violin(data: pd.DataFrame, columnas: list) -> None:
+        """
+        Genera un gráfico de violín de las columnas especificadas de un DataFrame,
 
-      Parámetros:
-      data (pd.DataFrame): El DataFrame que contiene los datos.
-      columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
+        Parámetros:
+        data (pd.DataFrame): El DataFrame que contiene los datos.
+        columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
 
-      Retorna:
-      Visualiza el gráfico de cada columna del argumento columnas
-      """
-      for column in columnas:
+        Retorna:
+        Visualiza el gráfico de cada columna del argumento columnas
+        """
+        for column in columnas:
             fig, axs = plt.subplots(1, 1, figsize=(15, 5))
-            sns.violinplot(x = column, data = data)
+            sns.violinplot(x=column, data=data)
             plt.tight_layout()
             plt.show()
 
-  @staticmethod
-  def calor(data: pd.DataFrame, columnas: list) -> None:
-      """
-      Genera un gráfico de calor de las columnas especificadas de un DataFrame,
+    @staticmethod
+    def calor(data: pd.DataFrame, columnas: list) -> None:
+        """
+        Genera un gráfico de calor de las columnas especificadas de un DataFrame,
 
-      Parámetros:
-      data (pd.DataFrame): El DataFrame que contiene los datos.
-      columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
+        Parámetros:
+        data (pd.DataFrame): El DataFrame que contiene los datos.
+        columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
 
-      Retorna:
-      Visualiza el gráfico de cada columna del argumento columnas
-      """
+        Retorna:
+        Visualiza el gráfico de cada columna del argumento columnas
+        """
 
-      correl =  data[columnas].corr()
-      fig, axs = plt.subplots(1, 1, figsize=(15, 5))
-      sns.heatmap(data = correl)
-      plt.tight_layout()
-      plt.show()
+        correl = data[columnas].corr()
+        fig, axs = plt.subplots(1, 1, figsize=(15, 5))
+        sns.heatmap(data=correl)
+        plt.tight_layout()
+        plt.show()
 
 
-def check_time_format(time_str, format='%m/%d/%Y'):
+def check_time_format(time_str, format="%m/%d/%Y"):
     try:
         datetime.strptime(str(time_str), format)
         return True
@@ -216,7 +218,7 @@ def detect_outliers_iqr(data, column):
     column (str): El nombre de la columna para la cual se calcularán los límites de los valores atípicos.
 
     Retorna:
-    tuple: Un par (lower_bound, upper_bound) donde `lower_bound` es el límite inferior y `upper_bound` es el límite superior 
+    tuple: Un par (lower_bound, upper_bound) donde `lower_bound` es el límite inferior y `upper_bound` es el límite superior
            para identificar los valores atípicos en la columna especificada.
     """
     Q1 = data[column].quantile(0.25)
@@ -249,7 +251,7 @@ def transform_outliers(data, column, lower_bound, upper_bound):
 
 def process_outliers(data, column):
     """
-    Procesa los valores atípicos en una columna de un DataFrame, detectándolos y ajustándolos dentro de los límites calculados 
+    Procesa los valores atípicos en una columna de un DataFrame, detectándolos y ajustándolos dentro de los límites calculados
     utilizando el método del rango intercuartílico (IQR).
 
     Parámetros:
@@ -270,7 +272,7 @@ def get_pca(data, n_components):
     Realiza Análisis de Componentes Principales (PCA) en los datos proporcionados.
 
     Parámetros:
-    data (pd.DataFrame o np.ndarray): Los datos de entrada en los que se aplicará el PCA. 
+    data (pd.DataFrame o np.ndarray): Los datos de entrada en los que se aplicará el PCA.
                                       Debe ser un DataFrame de pandas o un array de numpy.
     n_components (int): El número de componentes principales a retener.
 
@@ -299,7 +301,9 @@ def get_kbest(data_features, data_target, k):
     """
     kb = SelectKBest(score_func=f_regression, k=k)
     kb.fit(data_features, data_target.loc[:, data_target.columns[0]])
-    scores_df = pd.DataFrame(list(zip(data_features.columns, kb.scores_)), columns=['Feature', 'Score']).sort_values(by='Score', ascending=False)
+    scores_df = pd.DataFrame(
+        list(zip(data_features.columns, kb.scores_)), columns=["Feature", "Score"]
+    ).sort_values(by="Score", ascending=False)
 
     return scores_df
 
@@ -328,7 +332,11 @@ def get_varclushi(data):
     vc_info = vc.info
     vc_rsquare_df = vc.rsquare
 
-    best_features = vc_rsquare_df.sort_values(by=['Cluster','RS_Ratio'],ascending= False).groupby('Cluster').first()['Variable']
+    best_features = (
+        vc_rsquare_df.sort_values(by=["Cluster", "RS_Ratio"], ascending=False)
+        .groupby("Cluster")
+        .first()["Variable"]
+    )
 
     return vc_info, vc_rsquare_df, best_features
 
@@ -373,28 +381,28 @@ def get_information_value(df, var, tgt):
 def count_percentage(df, columna):
     # Realizar el conteo de valores en la columna especificada
     conteo = df[columna].value_counts().reset_index()
-    conteo.columns = [columna, 'conteo']
-    
+    conteo.columns = [columna, "conteo"]
+
     # Calcular los porcentajes
-    total = conteo['conteo'].sum()
-    conteo['porcentaje'] = round((conteo['conteo'] / total) * 100, 2)
-    
+    total = conteo["conteo"].sum()
+    conteo["porcentaje"] = round((conteo["conteo"] / total) * 100, 2)
+
     return conteo
 
 
 def create_feature_dataframe(data, column):
     feature = data.columns[0]
     category = data.at[0, column]
-    conteo = data.at[0, 'conteo']
-    porcentaje = data.at[0, 'porcentaje']
-    
+    conteo = data.at[0, "conteo"]
+    porcentaje = data.at[0, "porcentaje"]
+
     # Constructing the final dictionary
     variable = {
-        'feature': feature, 
-        'category': category,
-        'conteo': conteo,
-        'porcentaje': porcentaje
+        "feature": feature,
+        "category": category,
+        "conteo": conteo,
+        "porcentaje": porcentaje,
     }
-    
+
     # Converting the dictionary to a DataFrame
     return pd.DataFrame([variable])
