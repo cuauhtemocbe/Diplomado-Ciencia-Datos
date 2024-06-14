@@ -1,12 +1,13 @@
 services:
-  diplomado-ciencia-datos:
+  diplomado-ds:
     build:
       context: .
       dockerfile: Dockerfile
+    image: diplomado-ds:latest
+    container_name: diplomado-ds
     command: "/bin/bash"
     stdin_open: true
     tty: true
-    container_name: diplomado-ciencia-datos
     ports:
       - "8888:8888"
     volumes:

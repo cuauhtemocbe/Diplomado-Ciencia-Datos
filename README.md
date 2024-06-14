@@ -51,7 +51,7 @@ Si prefieres utilizar Jupyter Lab con Docker, sigue estos pasos:
 2. Luego, ejecuta el siguiente comando para ingresar al contenedor y utilizar la terminal:
 
     ```bash
-    docker exec -it diplomado-ciencia-datos bash
+    docker exec -it diplomado-ds bash
     ```
 
 3. Dentro del contenedor, inicia el servicio de Jupyter Lab con el siguiente comando:
