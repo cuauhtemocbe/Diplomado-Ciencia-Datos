@@ -2,7 +2,7 @@
 
 Espacio para subir las actividades realizadas durante el diplomado de Ciencia de Datos 2024-2025. 
 
-Este repositorio utiliza Docker para configurar un entorno de Python 3.10.11 orientado a **Ciencia de Datos** con Jupyter, facilitando la gestión de bibliotecas mediante Poetry.
+Este repositorio utiliza Docker para configurar un entorno de Python 3.12.3 orientado a **Ciencia de Datos** con Jupyter, facilitando la gestión de bibliotecas mediante Poetry.
 
 ## Requisitos Previos
 
@@ -35,7 +35,7 @@ Si prefieres usar Visual Studio Code para desarrollar o ejecutar los notebooks, 
 2. Instala la extensión **Dev Containers** desde el Marketplace de VSC.
 3. Abre la Paleta de Comandos (Command Palette) con `Shift + Ctrl + P` y escribe `Dev Containers: Rebuild and Reopen in Container`. Ejecútalo para construir y levantar el contenedor Docker.
 4. En el explorador de archivos (`Ctrl + Shift + E`), navega hasta la carpeta `notebooks` y abre el archivo `0-Hello-Pandas.ipynb`.
-5. Ejecuta la primer celda; al inicio te solicitará seleccionar un kernel, elige Python 3.10.11.
+5. Ejecuta la primer celda; al inicio te solicitará seleccionar un kernel, elige Python 3.12.3.
 6. Disfruta
 
 ### Configuración con Jupyter Lab (Opción Sencilla)
