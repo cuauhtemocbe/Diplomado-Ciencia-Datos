@@ -41,7 +41,8 @@
 				"ms-python.debugpy",
 				"ms-toolsai.jupyter",
 				"tamasfe.even-better-toml",
-				"ms-python.black-formatter"
+				"ms-python.black-formatter",
+				"freakypie.code-python-isort"
 			]
 		}
 	}
