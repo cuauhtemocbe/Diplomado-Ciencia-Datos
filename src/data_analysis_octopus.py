@@ -5,13 +5,14 @@ realizar gráficas por tipo de variable (Discretas y continuas)
 
 __version__ = "1.0.1"
 
-import pandas as pd
 from datetime import datetime
+
 import matplotlib.pyplot as plt
-import seaborn as sns
 import numpy as np
-from sklearn.feature_selection import SelectKBest, f_regression, f_classif
+import pandas as pd
+import seaborn as sns
 from sklearn.decomposition import PCA
+from sklearn.feature_selection import SelectKBest, f_classif, f_regression
 from varclushi import VarClusHi
 
 
