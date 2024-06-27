@@ -306,7 +306,7 @@ def get_kbest(data_features, data_target, k):
         list(zip(data_features.columns, kb.scores_)), columns=["Feature", "Score"]
     ).sort_values(by="Score", ascending=False)
 
-    return scores_df
+    return scores_df.reset_index(drop=True)
 
 
 def get_varclushi(data):
