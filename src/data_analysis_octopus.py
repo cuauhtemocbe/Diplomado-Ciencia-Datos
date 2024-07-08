@@ -3,7 +3,7 @@ El modulo sirve para analizar la completitud de un conjunto de datos y
 realizar gráficas por tipo de variable (Discretas y continuas)
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 
 from datetime import datetime
 
@@ -12,8 +12,53 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest, f_classif, f_regression
+from sklearn.feature_selection import SelectKBest, f_regression
 from varclushi import VarClusHi
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.feature_selection import RFECV
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import (
+    MinMaxScaler, StandardScaler, RobustScaler)
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from scipy.sparse import csr_matrix
+from sklearn.model_selection import (GridSearchCV, cross_val_score,
+                                     train_test_split, StratifiedKFold)
+from sklearn.metrics import classification_report, f1_score, roc_auc_score
+from sklearn.feature_selection import RFECV
+
+
+class GroupNumericalFeatures(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        self.bins_dict = {}  # Diccionario para almacenar los bins calculados por columna
+
+    def fit(self, X):
+        self.bins_dict = {}
+        self.numerical_columns = X.select_dtypes(include=["number"]).columns  # Obtener columnas numéricas
+        
+        for col in self.numerical_columns:
+            # Calcular bins basados en cuantiles de la columna especificada
+            quantiles = np.unique(
+                X[col].quantile([0, 0.2, 0.4, 0.6, 0.8, 1]).values
+            )
+            bins = list(quantiles[:-1]) + [quantiles[-1] + 0.01]
+            self.bins_dict[col] = bins
+        return self
+
+    def transform(self, X):
+        X_transformed = pd.DataFrame(index=X.index)
+        
+        for col in self.bins_dict:
+            bins = self.bins_dict[col]
+            labels = [f"{bins[i]}_a_{bins[i+1]}" for i in range(len(bins)-1)]
+            X_transformed[f"cat_{col}"] = pd.cut(X[col], bins=bins, labels=labels, right=False)
+        
+        return X_transformed
+
+    def fit_transform(self, X):
+        self.fit(X)
+        return self.transform(X)
 
 
 class DataViz:
@@ -407,3 +452,183 @@ def create_feature_dataframe(data, column):
 
     # Converting the dictionary to a DataFrame
     return pd.DataFrame([variable])
+
+
+def transform_data(X_train, X_test, numerical_features=None,
+                   categorical_features=None):
+    
+    numerical_transformer = Pipeline(steps=[
+    ("imputer", SimpleImputer(strategy="median")),
+    ("scaler", MinMaxScaler()),  
+    ])
+
+    categorical_transformer = Pipeline(steps=[
+    ("imputer", SimpleImputer(strategy="most_frequent")),
+    ("onehot", OneHotEncoder(drop="first", handle_unknown="ignore"))
+    ])
+
+    transformers = []
+    if numerical_features:
+        transformers.append(("num", numerical_transformer, numerical_features))
+
+    if categorical_features:
+        transformers.append(("cat", categorical_transformer, categorical_features))
+
+    preprocessor = ColumnTransformer(transformers=transformers)
+
+    # Ajustar y transformar los datos de entrenamiento
+    X_train_transformed_data = preprocessor.fit_transform(X_train)
+    X_test_transformed_data = preprocessor.transform(X_test)
+    # # Obtener los nombres de las columnas después de aplicar OneHotEncoder
+    # onehot_encoder = preprocessor.named_transformers_["cat"].named_steps["onehot"]
+    # categorical_features_encoded = onehot_encoder.get_feature_names_out(
+    #     input_features=categorical_features)
+
+    # if numerical_features:
+    #     feature_names =  numerical_features + list(categorical_features_encoded)
+    # else:
+    #     feature_names = list(categorical_features)
+     # Get feature names after transformation
+    feature_names = []
+    if numerical_features:
+        feature_names += numerical_features
+    if categorical_features:
+        onehot_encoder = preprocessor.named_transformers_["cat"].named_steps["onehot"]
+        categorical_features_encoded = onehot_encoder.get_feature_names_out(
+            input_features=categorical_features)
+        feature_names += list(categorical_features_encoded)
+
+    train_index = X_train.index
+    test_index = X_test.index
+
+    # Convertir los datos transformados a DataFrames de Pandas
+    X_train_transformed_df = pd.DataFrame(X_train_transformed_data, columns=feature_names, index=train_index)
+    X_test_transformed_df = pd.DataFrame(X_test_transformed_data, columns=feature_names, index=test_index)
+
+
+    return X_train_transformed_df, X_test_transformed_df, preprocessor
+
+
+def _set_n_jobs_config(model):
+    if "n_jobs" in model.__dict__:
+        model_to_train = model(n_jobs=-1)
+    else:
+        model_to_train = model()
+    return model_to_train
+
+
+def perform_grid_search(X_train, y_train, model, param_grid, cv=3, verbose=True):
+
+    if verbose:
+        verbose = 3
+    else:
+        verbose = 1
+
+    model_to_train = _set_n_jobs_config(model)
+    
+    grid_search = GridSearchCV(
+        model_to_train, param_grid, cv=StratifiedKFold(n_splits=cv),
+        scoring="f1_micro", n_jobs=-1, error_score=-1, verbose=verbose
+    )
+    # Entrenamiento
+    grid_search.fit(X_train, y_train)
+    # Obtener los mejores hiperparámetros y el mejor modelo
+    best_model = grid_search.best_estimator_
+    print("Mejores hiperparámetros encontrados GridSearchCV:")
+    print(grid_search.best_params_)
+
+    return best_model, grid_search.best_params_
+
+
+def cross_validation_report(model, X_train, y_train, verbose):
+    cv_scores = cross_val_score(
+            model,
+            X_train,
+            y_train,
+            cv=10,
+            scoring="f1_micro",
+        )
+
+    f1_mean_score_train = cv_scores.mean()
+    std_dev_train = round(np.std(cv_scores), 4)
+
+    if verbose:
+        print(">>> F1 Macro Score de validación cruzada (train):", f1_mean_score_train)
+        print(">>> Standar deviation (train):", std_dev_train)
+
+    return f1_mean_score_train, std_dev_train
+
+
+def test_report(model, X_test, y_test, verbose):
+    # Predicción y evaluación en el conjunto de prueba
+    y_pred = model.predict(X_test)
+    # Evaluación del modelo en el conjunto de prueba
+    f1_score_test = f1_score(y_test, y_pred)
+
+    if verbose:
+        print(">>> F1 Macro Score en el conjunto de prueba (test):", f1_score_test)
+        print("\nReporte de Clasificación en el conjunto de prueba:")
+        print(classification_report(y_test, y_pred))
+
+    return f1_score_test
+
+
+def train_classifier_model(X_train, X_test, y_train, y_test, model, param_grid=None, verbose: bool = True):
+    model_name = model.__name__.lower()
+
+    if model_name in ["svc"]:
+        X_train = csr_matrix(X_train)
+        X_test = csr_matrix(X_test)
+    # Si se proporciona un grid de parámetros, realizar GridSearchCV
+    if param_grid:
+        best_model, best_params = perform_grid_search(
+            X_train, y_train, model, param_grid, verbose=verbose)
+    else:
+        best_params = ""
+        model_to_train = _set_n_jobs_config(model)
+        best_model = model_to_train
+        best_model.fit(X_train, y_train)
+
+    f1_mean_score_train, std_dev_train = cross_validation_report(
+        best_model, X_train, y_train, verbose)
+    f1_score_test = test_report(best_model, X_test, y_test, verbose)
+    
+    return best_model, best_params, f1_mean_score_train, std_dev_train, f1_score_test
+
+
+def evaluate_models(params_dict, X_train, X_test, y_train, y_test):
+    results_list = []
+    for model_name, model in params_dict.items():
+        results = train_classifier_model(
+            X_train, X_test, y_train, y_test, model=model, verbose=False
+        )
+
+        _, _, f1_mean_score_train, std_dev_train, f1_score_test = results
+
+        results_list.append([
+            model_name, f1_mean_score_train, std_dev_train, f1_score_test
+        ])
+        
+    return pd.DataFrame(results_list, columns=["model", "f1-score-train", "std-dev", "f1-score-test"])
+
+
+def get_best_features_rfecv(X, y, model, scoring):
+    
+    rfecv = RFECV(estimator=model, step=1, cv=StratifiedKFold(5), scoring=scoring)
+    rfecv.fit(X, y)
+
+    return X.columns[rfecv.support_].tolist()
+
+
+def get_feature_importances(model, X):
+    coefficients = pd.Series(model.coef_.flatten())
+    features_df = pd.DataFrame(
+        {
+            "Características": pd.Series(X.columns),
+            "Coeficientes": coefficients
+        }
+    )
+
+    features_df["Importancia"] = features_df["Coeficientes"].abs()
+    features_df = features_df.sort_values(by="Importancia", ascending=False)
+    return features_df.reset_index(drop=True)
