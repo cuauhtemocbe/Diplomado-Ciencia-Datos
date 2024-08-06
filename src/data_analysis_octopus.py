@@ -3,30 +3,46 @@ El modulo sirve para analizar la completitud de un conjunto de datos y
 realizar gráficas por tipo de variable (Discretas y continuas)
 """
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 
+import collections
 from datetime import datetime
+from typing import List, Tuple, Union, TypeAlias
 
 import matplotlib.pyplot as plt
+import neurokit2 as nk
 import numpy as np
 import pandas as pd
+import scipy.stats as stats
 import seaborn as sns
-from sklearn.decomposition import PCA
-from sklearn.feature_selection import SelectKBest, f_regression
-from varclushi import VarClusHi
-from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.feature_selection import RFECV
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import (
-    MinMaxScaler, StandardScaler, RobustScaler)
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.compose import ColumnTransformer
+import wfdb
+from data_analysis_octopus import *
+from IPython.display import clear_output
+from joblib import Parallel, delayed
 from scipy.sparse import csr_matrix
-from sklearn.model_selection import (GridSearchCV, cross_val_score,
-                                     train_test_split, StratifiedKFold)
+from sklearn import metrics
+from sklearn.base import BaseEstimator, TransformerMixin, clone
+from sklearn.compose import ColumnTransformer
+from sklearn.decomposition import PCA
+from sklearn.feature_selection import RFECV, SelectKBest, f_regression
+from sklearn.impute import SimpleImputer
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, f1_score, roc_auc_score
-from sklearn.feature_selection import RFECV
+from sklearn.model_selection import (GridSearchCV, StratifiedKFold,
+                                     cross_val_score, train_test_split)
+from sklearn.naive_bayes import ComplementNB, GaussianNB, MultinomialNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import (MinMaxScaler, OneHotEncoder, RobustScaler,
+                                   StandardScaler)
+from sklearn.svm import SVC
+from sklearn.tree import DecisionTreeClassifier
+from varclushi import VarClusHi
+from xgboost import XGBClassifier
+
+ModelClassifier: TypeAlias = Union[SVC, KNeighborsClassifier, DecisionTreeClassifier,
+                       GaussianNB, MultinomialNB, ComplementNB,
+                       LogisticRegression, XGBClassifier]
 
 
 class GroupNumericalFeatures(BaseEstimator, TransformerMixin):
@@ -87,6 +103,8 @@ class DataViz:
 
         # Concatenar los resultados
         result_df = pd.concat([count_nulls, null_percent], axis=1)
+        result_df = result_df.reset_index()
+        result_df = result_df.rename(columns={'index': 'features'})
 
         return result_df
 
@@ -509,14 +527,6 @@ def transform_data(X_train, X_test, numerical_features=None,
     return X_train_transformed_df, X_test_transformed_df, preprocessor
 
 
-def _set_n_jobs_config(model):
-    if "n_jobs" in model.__dict__:
-        model_to_train = model(n_jobs=-1)
-    else:
-        model_to_train = model()
-    return model_to_train
-
-
 def perform_grid_search(X_train, y_train, model, param_grid, cv=3, verbose=True):
 
     if verbose:
@@ -524,10 +534,8 @@ def perform_grid_search(X_train, y_train, model, param_grid, cv=3, verbose=True)
     else:
         verbose = 1
 
-    model_to_train = _set_n_jobs_config(model)
-    
     grid_search = GridSearchCV(
-        model_to_train, param_grid, cv=StratifiedKFold(n_splits=cv),
+        model, param_grid, cv=StratifiedKFold(n_splits=cv),
         scoring="f1_micro", n_jobs=-1, error_score=-1, verbose=verbose
     )
     # Entrenamiento
@@ -565,18 +573,25 @@ def test_report(model, X_test, y_test, verbose):
     # Evaluación del modelo en el conjunto de prueba
     f1_score_test = f1_score(y_test, y_pred)
 
+    try:
+        y_prob = model.predict_proba(X_test)[:, 1]
+        roc_auc_test = round(roc_auc_score(y_test, y_prob), 2)
+
+    except:
+        roc_auc_test = np.nan
+
     if verbose:
         print(">>> F1 Macro Score en el conjunto de prueba (test):", f1_score_test)
         print("\nReporte de Clasificación en el conjunto de prueba:")
         print(classification_report(y_test, y_pred))
 
-    return f1_score_test
+    return f1_score_test, roc_auc_test
 
 
 def train_classifier_model(X_train, X_test, y_train, y_test, model, param_grid=None, verbose: bool = True):
-    model_name = model.__name__.lower()
+    model_name = type(model).__name__
 
-    if model_name in ["svc"]:
+    if model_name in ["SVC"]:
         X_train = csr_matrix(X_train)
         X_test = csr_matrix(X_test)
     # Si se proporciona un grid de parámetros, realizar GridSearchCV
@@ -585,15 +600,15 @@ def train_classifier_model(X_train, X_test, y_train, y_test, model, param_grid=N
             X_train, y_train, model, param_grid, verbose=verbose)
     else:
         best_params = ""
-        model_to_train = _set_n_jobs_config(model)
-        best_model = model_to_train
+        best_model = model
         best_model.fit(X_train, y_train)
 
     f1_mean_score_train, std_dev_train = cross_validation_report(
         best_model, X_train, y_train, verbose)
-    f1_score_test = test_report(best_model, X_test, y_test, verbose)
+    f1_score_test, roc_auc_test = test_report(best_model, X_test, y_test, verbose)
     
-    return best_model, best_params, f1_mean_score_train, std_dev_train, f1_score_test
+    return (best_model, best_params, f1_mean_score_train, std_dev_train,
+            f1_score_test, roc_auc_test)
 
 
 def evaluate_models(params_dict, X_train, X_test, y_train, y_test):
@@ -603,13 +618,14 @@ def evaluate_models(params_dict, X_train, X_test, y_train, y_test):
             X_train, X_test, y_train, y_test, model=model, verbose=False
         )
 
-        _, _, f1_mean_score_train, std_dev_train, f1_score_test = results
+        _, _, f1_mean_score_train, std_dev_train, f1_score_test, roc_auc_test = results
 
         results_list.append([
-            model_name, f1_mean_score_train, std_dev_train, f1_score_test
+            model_name, f1_mean_score_train, std_dev_train, f1_score_test, roc_auc_test
         ])
         
-    return pd.DataFrame(results_list, columns=["model", "f1-score-train", "std-dev", "f1-score-test"])
+    return pd.DataFrame(results_list, columns=[
+        "model", "f1-score-train", "std-dev", "f1-score-test", "roc-auc-test"])
 
 
 def get_best_features_rfecv(X, y, model, scoring):
@@ -632,3 +648,173 @@ def get_feature_importances(model, X):
     features_df["Importancia"] = features_df["Coeficientes"].abs()
     features_df = features_df.sort_values(by="Importancia", ascending=False)
     return features_df.reset_index(drop=True)
+
+
+def freq_discrete(df, features):
+    for feature in features:
+        print(f"Feature: {feature}")
+        abs_ = df[feature].value_counts(dropna=False).to_frame().rename(columns={"count": "Absolute frequency"})
+        rel_ = df[feature].value_counts(dropna=False, normalize= True).to_frame().rename(columns={"proportion": "Relative frequency"})
+        freq = abs_.join(rel_)
+        freq["Accumulated frequency"] = freq["Absolute frequency"].cumsum()
+        freq["Accumulated %"] = freq["Relative frequency"].cumsum()
+        freq["Absolute frequency"] = freq["Absolute frequency"].map(lambda x: "{:,.0f}".format(x))
+        freq["Relative frequency"] = freq["Relative frequency"].map(lambda x: "{:,.2%}".format(x))
+        freq["Accumulated frequency"] = freq["Accumulated frequency"].map(lambda x: "{:,.0f}".format(x))
+        freq["Accumulated %"] = freq["Accumulated %"].map(lambda x: "{:,.2%}".format(x))
+        display(freq)
+
+
+def get_features_by_xgb_importance(
+        model: XGBClassifier, importance_type: str) -> List:
+    """Returns a list with the features sorted by importance"""
+
+    imp_scores_d = model.get_booster().get_score(
+        importance_type=importance_type)
+    sorted_imp = sorted(imp_scores_d.items(), key=lambda kv: kv[1])
+    sorted_dict = collections.OrderedDict(sorted_imp)
+
+    return [key for key in sorted_dict.keys()]
+
+def estimate_score_metrics(y_test: pd.Series,
+                           y_pred: np.ndarray,
+                           y_prob: np.ndarray
+                           ) -> Tuple[float, float, int, int, int, int]:
+    """Returns the following evaluation metrics: ROC, ROC_AUC,
+    \rF1-score, Recall, Accuracy, Brier"""
+    roc = round(metrics.roc_auc_score(y_test, y_pred), 2)
+    roc_auc = round(metrics.roc_auc_score(y_test, y_prob), 2)
+
+    f1 = round(metrics.f1_score(y_test, y_pred) * 100)
+    recall = round(metrics.recall_score(y_test, y_pred) * 100)
+    accuracy = round(metrics.accuracy_score(y_test, y_pred) * 100)
+    brier = round(metrics.brier_score_loss(y_test, y_pred) * 100)
+
+    return roc, roc_auc, f1, recall, accuracy, brier
+
+
+def get_total_iterations(model, importance_types_list: List) -> int:
+    """Returns the total of iterations for the modeling by xgb
+    feature importance"""
+    no_elements = 1
+    for imp_type in importance_types_list:
+        features = get_features_by_xgb_importance(
+            model=model, importance_type=imp_type)
+
+        while len(features) > 0:
+            _ = features.pop(0)
+            no_elements += 1
+
+    return no_elements
+
+def modeling_by_subset(
+        model: ModelClassifier,
+        x_train: pd.DataFrame,
+        y_train: Union[pd.Series, pd.DataFrame],
+        features: List) -> np.array:
+    """Returns an array with Machine Learning model, identifier of model,
+    number of features, metrics scores, """
+    return model.fit(x_train[features], y_train)
+
+
+def predict_by_subset(
+        predictor: ModelClassifier,
+        x_test: pd.DataFrame,
+        features: List) -> np.array:
+    """Returns an array with Machine Learning model, identifier of model,
+    number of features, metrics scores, """
+    x_test_subset = x_test[features]
+    y_pred = predictor.predict(x_test_subset)
+    y_prob = np.around(predictor.predict_proba(x_test_subset)[:, 1], 2)
+
+    return y_pred, y_prob
+
+
+def modeling_by_xgb_importance(
+        model_name: str,
+        model: ModelClassifier,
+        x_train: pd.DataFrame,
+        y_train: pd.DataFrame,
+        x_test: pd.DataFrame,
+        y_test) -> pd.DataFrame:
+    """Returns a dataframe of models scores using xgboost feature
+    \r importance to select the best features
+    """
+    gral_model = XGBClassifier(n_jobs=-1)
+    gral_model_fitted = gral_model.fit(x_train, y_train)
+    imp_types_lst = ['total_gain', 'total_cover', 'weight', 'gain', 'cover']
+
+    no_elements = get_total_iterations(gral_model_fitted, imp_types_lst)
+    count = 1
+    row_lst: List[np.array] = []
+    row_array = np.array(row_lst)
+
+    for importance_type in imp_types_lst:
+        features_list = get_features_by_xgb_importance(
+            model=gral_model_fitted, importance_type=importance_type)
+
+        while len(features_list) > 0:
+
+            predictor = modeling_by_subset(model=clone(model),
+                                           x_train=x_train,
+                                           y_train=y_train,
+                                           features=features_list)
+
+            y_pred, y_prob = predict_by_subset(predictor=predictor,
+                                               x_test=x_test,
+                                               features=features_list)
+
+            score_metrics = estimate_score_metrics(
+                y_test=y_test, y_pred=y_pred, y_prob=y_prob)
+
+            row_lst.append(np.array([
+                model_name,
+                'model_' + str(count),
+                len(features_list),
+                *score_metrics,
+                importance_type,
+                ','.join(features_list)]))
+
+            count += 1
+            _ = features_list.pop(0)
+
+            txt = 'of ' + ' Modeling with ' + str(model_name) + ' :'
+            update_progress(count / no_elements, progress_text=txt)
+
+        row_array = np.array(row_lst)
+
+    # Names of columns of info value dataframe
+    cols_dict = {
+        'Models': str, 'Id': str, 'No_features': int, 'ROC': float,
+        'ROC_AUC': float, 'F1': float, 'Recall': float, 'Accuracy': float,
+        'Brier': float, 'Importance_type': str, 'Best_features': str,}
+
+    cols_name = [names for names in cols_dict]
+    df = pd.DataFrame(data=row_array, columns=cols_name)
+    df = df.astype(cols_dict)
+
+    df = df.sort_values(['F1', 'ROC_AUC', 'No_features'],
+                        ascending=False).reset_index(drop=True)
+
+    clear_output(wait=False)
+
+    return df
+
+
+def update_progress(progress, progress_text=''):
+    """ Print the progress of a 'FOR' inside a function """
+
+    bar_length = 40
+    if isinstance(progress, int):
+        progress = float(progress)
+    if not isinstance(progress, float):
+        progress = 0
+    progress = max(progress, 0)
+    progress = min(progress, 1)
+    block = int(round(bar_length * progress))
+    clear_output(wait=True)
+    text = ' '.join(['Progress', progress_text, '[{0}] {1:.1f}%'])
+    ouput_text = text.format("#" * block + "-" * (bar_length - block),
+                             progress * 100)
+
+    print(ouput_text)
