@@ -1,0 +1,9 @@
+Feature,Description
+age,Edad del paciente.
+gender,"Género del paciente, donde 1 podría indicar masculino y 0 femenino (esto es una suposición común)."
+impluse,Pulso del paciente.
+pressurehight,Presión arterial sistólica (el número más alto).
+pressurelow,Presión arterial diastólica (el número más bajo).
+glucose,Nivel de glucosa en sangre.
+kcm,"Nivel de Creatina Quinasa-MB (CK-MB), un biomarcador utilizado para detectar daño al tejido cardíaco, especialmente útil en el diagnóstico de ataques cardíacos."
+troponin,"Nivel de troponina, un biomarcador utilizado para identificar daño al corazón."
