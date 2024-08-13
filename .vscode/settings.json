@@ -1,4 +1,8 @@
 {
+    "python.pythonPath": "/usr/local/bin/python",
+    "python.analysis.extraPaths": [
+        "/workp/src"
+    ],
     "python.testing.pytestArgs": [
         "tests"
     ],
