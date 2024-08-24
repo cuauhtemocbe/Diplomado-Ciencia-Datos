@@ -815,3 +815,21 @@ def update_progress(progress, progress_text=''):
                              progress * 100)
 
     print(ouput_text)
+
+
+def heatmap(data, title="Mapa de Calor"):
+    # Crear el mapa de calor
+    fig = px.imshow(data, title="Mapa de Calor", color_continuous_scale="RdBu_r")
+
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            fig.add_annotation(
+                x=j,
+                y=i,
+                text=f"{data.iloc[i, j]:.2f}",  # Formatear el valor como número decimal
+                font=dict(size=10, color="white"),
+                showarrow=False,
+                align="center"
+            )
+    # Mostrar el gráfico
+    fig.show()
