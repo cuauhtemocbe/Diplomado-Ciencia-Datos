@@ -933,3 +933,32 @@ def heatmap(data, title="Mapa de Calor", width=800, height=600, cell_width=30, c
 
     # Mostrar el gráfico
     fig.show()
+
+
+def reduce_cardinality(df, col, threshold=0.1):
+    # Calcular la frecuencia de cada categoría en la columna especificada
+    # `value_counts(normalize=True)` devuelve la proporción de cada categoría en lugar del conteo absoluto
+    freq = df[col].value_counts(normalize=True)
+    
+    # Identificar las categorías que tienen una frecuencia menor al umbral especificado
+    # `freq < threshold` devuelve una serie booleana donde las categorías con frecuencia menor al umbral son True
+    # `.index` obtiene los nombres de estas categorías
+    low_freq_categories = freq[freq < threshold].index
+    
+    # Agrupar las categorías que tienen una frecuencia baja en una nueva categoría llamada "Otros"
+    # La función lambda reemplaza cualquier categoría en `low_freq_categories` con "Otros"
+    # Las categorías con frecuencia suficiente se mantienen sin cambios
+    df[col] = df[col].apply(lambda x: "Otros" if x in low_freq_categories else x)
+    
+    return df
+
+
+def plot_heatmap_clusters(df, cluster_col='cluster', annot_fontsize=8, figsize=(12, 2)):
+  scaler = MinMaxScaler()
+  scaled_df = scaler.fit_transform(df.drop(columns=[cluster_col]))
+  scaled_df[cluster_col] = df[cluster_col]
+  cluster_means = scaled_df.groupby(cluster_col).median().round(1)
+  plt.figure(figsize=figsize)
+  sns.heatmap(cluster_means, annot=True, cmap='viridis', fmt='.1f', annot_kws={'size': annot_fontsize})
+  plt.title('Mapa de Calor de Medias de Características por Clúster')
+  plt.show()
