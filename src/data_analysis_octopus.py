@@ -953,12 +953,12 @@ def reduce_cardinality(df, col, threshold=0.1):
     return df
 
 
-def plot_heatmap_clusters(df, cluster_col='cluster', annot_fontsize=8, figsize=(12, 2)):
+def plot_heatmap_clusters(df, cluster_col="cluster", agg_func= "median", annot_fontsize=8, figsize=(12, 2)):
   scaler = MinMaxScaler()
   scaled_df = scaler.fit_transform(df.drop(columns=[cluster_col]))
   scaled_df[cluster_col] = df[cluster_col]
-  cluster_means = scaled_df.groupby(cluster_col).median().round(1)
+  aggregated_cluster = scaled_df.groupby(cluster_col).agg(agg_func).round(2)
   plt.figure(figsize=figsize)
-  sns.heatmap(cluster_means, annot=True, cmap='viridis', fmt='.1f', annot_kws={'size': annot_fontsize})
-  plt.title('Mapa de Calor de Medias de Características por Clúster')
+  sns.heatmap(aggregated_cluster, annot=True, cmap="viridis", fmt=".2f", annot_kws={"size": annot_fontsize})
+  plt.title(f"Mapa de Calor de '{agg_func}' de Características por Clúster")
   plt.show()
