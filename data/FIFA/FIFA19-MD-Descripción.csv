@@ -1,0 +1,77 @@
+Variable,Descripción
+ID,Identificador único asignado a cada jugador.
+Age,Edad actual del jugador en años.
+Overall,"Calificación general del jugador, que resume sus habilidades y desempeño global."
+Potential,Calificación del potencial máximo que el jugador puede alcanzar según su desempeño y desarrollo dentro del juego.
+Value,"Valor de mercado del jugador en el juego, expresado generalmente en euros o libras."
+Wage,"Ingreso semanal del jugador dentro del juego, representado usualmente en euros o libras."
+Special,Puntuación general que resume la habilidad técnica del jugador en diferentes aspectos del juego.
+International Reputation,"Indicador que refleja cómo es valorado el jugador a nivel internacional, en una escala de 1 a 5."
+Weak Foot,"Calificación que indica la habilidad del jugador para usar su pie no dominante, en una escala de 1 a 5."
+Skill Moves,"Número de movimientos de habilidad técnicos que el jugador puede realizar, en una escala de 1 a 5."
+Work Rate,Calificación que refleja la frecuencia y el esfuerzo que un jugador pone en el juego tanto en ofensiva como en defensiva.
+Height,"Altura del jugador, generalmente medida en centímetros."
+Weight,"Peso del jugador, típicamente expresado en kilogramos."
+LS,Calificación específica para el rendimiento del jugador en la posición de delantero izquierdo.
+ST,Calificación específica para el rendimiento del jugador en la posición central de delantero.
+RS,Calificación específica para el rendimiento del jugador en la posición de delantero derecho.
+LW,Calificación específica para el rendimiento del jugador en la posición de extremo izquierdo.
+LF,Calificación específica para el rendimiento del jugador en la posición de delantero izquierdo.
+CF,Calificación específica para el rendimiento del jugador en la posición de delantero centro.
+RF,Calificación específica para el rendimiento del jugador en la posición de delantero derecho.
+RW,Calificación específica para el rendimiento del jugador en la posición de extremo derecho.
+LAM,Calificación específica para el rendimiento del jugador en la posición de mediocampista ofensivo izquierdo.
+CAM,Calificación específica para el rendimiento del jugador en la posición de mediocampista ofensivo central.
+RAM,Calificación específica para el rendimiento del jugador en la posición de mediocampista ofensivo derecho.
+LM,Calificación específica para el rendimiento del jugador en la posición de mediocampista izquierdo.
+LCM,Calificación específica para el rendimiento del jugador en la posición de mediocampista central izquierdo.
+CM,Calificación específica para el rendimiento del jugador en la posición central de mediocampista.
+RCM,Calificación específica para el rendimiento del jugador en la posición de mediocampista central derecho.
+RM,Calificación específica para el rendimiento del jugador en la posición de mediocampista derecho.
+LWB,Calificación específica para el rendimiento del jugador en la posición de lateral izquierdo o carrilero.
+LDM,Calificación específica para el rendimiento del jugador en la posición de mediocampista defensivo izquierdo.
+CDM,Calificación específica para el rendimiento del jugador en la posición de mediocampista defensivo central.
+RDM,Calificación específica para el rendimiento del jugador en la posición de mediocampista defensivo derecho.
+RWB,Calificación específica para el rendimiento del jugador en la posición de lateral derecho o carrilero.
+LB,Calificación específica para el rendimiento del jugador en la posición de defensa lateral izquierdo.
+LCB,Calificación específica para el rendimiento del jugador en la posición de defensa central izquierdo.
+CB,Calificación específica para el rendimiento del jugador en la posición central de la defensa.
+RCB,Calificación específica para el rendimiento del jugador en la posición de defensa central derecho.
+RB,Calificación específica para el rendimiento del jugador en la posición de defensa lateral derecho.
+Crossing,Calificación que evalúa la habilidad del jugador para realizar centros precisos desde las bandas hacia el área de penal.
+Finishing,Calificación que mide la precisión y habilidad del jugador para convertir oportunidades de gol cerca del área.
+HeadingAccuracy,Calificación que evalúa la precisión de un jugador al golpear el balón con la cabeza.
+ShortPassing,Calificación que mide la precisión y efectividad de los pases cortos del jugador.
+Volleys,Calificación que evalúa la habilidad del jugador para ejecutar voleas.
+Dribbling,Calificación que mide la habilidad del jugador para mantener el control del balón mientras dribla.
+Curve,Calificación que refleja la habilidad del jugador para dar efecto y curvatura al balón.
+FKAccuracy,Calificación que evalúa la precisión del jugador en tiros libres.
+LongPassing,Calificación que mide la precisión y efectividad de los pases largos del jugador.
+BallControl,Calificación que evalúa la habilidad del jugador para controlar el balón con los pies.
+Acceleration,Calificación que refleja la rapidez con que un jugador puede alcanzar su velocidad máxima desde una posición estática.
+SprintSpeed,Calificación que mide la velocidad máxima que un jugador puede mantener durante una carrera.
+Agility,Calificación que evalúa la rapidez de los movimientos y cambios de dirección del jugador.
+Reactions,Calificación que mide la rapidez y precisión de las respuestas del jugador a situaciones de juego en tiempo real.
+Balance,Calificación que indica la habilidad del jugador para mantenerse estable mientras está en movimiento o bajo presión.
+ShotPower,Calificación que mide la potencia de los disparos del jugador.
+Jumping,Calificación que refleja la habilidad del jugador para saltar y ganar duelos aéreos.
+Stamina,Calificación que indica la resistencia del jugador y su capacidad para mantener el rendimiento durante todo el partido.
+Strength,Calificación que evalúa la fuerza física del jugador.
+LongShots,Calificación que mide la habilidad y precisión del jugador en disparos desde larga distancia.
+Aggression,Calificación que refleja el nivel de agresividad del jugador en su juego.
+Interceptions,Calificación que evalúa la habilidad del jugador para interceptar pases del equipo contrario.
+Positioning,Calificación que mide la habilidad del jugador para colocarse en la posición óptima tanto en situaciones ofensivas como defensivas.
+Vision,Calificación que refleja la habilidad del jugador para ver y ejecutar jugadas clave durante el partido.
+Penalties,Calificación que mide la eficacia del jugador al ejecutar tiros penales.
+Composure,Calificación que evalúa la habilidad del jugador para mantener la calma y tomar decisiones bajo presión.
+Marking,Calificación que mide la efectividad del jugador en mantener la cobertura sobre un oponente directo.
+StandingTackle,Calificación que evalúa la habilidad del jugador para realizar entradas en pie y ganar la posesión del balón.
+SlidingTackle,Calificación que mide la eficacia del jugador al realizar barridas para recuperar el balón.
+GKDiving,Calificación que evalúa la habilidad del portero para realizar atajadas mientras se lanza en el aire.
+GKHandling,Calificación que mide la habilidad del portero para manejar el balón con las manos bajo presión.
+GKKicking,Calificación que refleja la precisión y potencia del portero al despejar el balón con un pase o un tiro largo.
+GKPositioning,Calificación que evalúa la capacidad de un portero para posicionarse adecuadamente durante el juego.
+GKReflexes,Calificación que mide la rapidez y eficacia de los reflejos de un portero.
+Preferred Foot,"Indica el pie con el que el jugador prefiere jugar, puede ser 'izquierdo' o 'derecho'."
+Body Type,"Descripción del tipo físico del jugador, que puede influir en su movilidad y estilo de juego."
+Position,"La posición principal en la que juega el futbolista en el campo. ST: Delantero Centro (Striker), AM: Mediocampista Ofensivo (Attacking Midfielder), MF: Mediocampista (Midfielder), DF: Defensor (Defender), DM: Mediocampista Defensivo (Defensive Midfielder), GK: Portero (Goalkeeper)"
