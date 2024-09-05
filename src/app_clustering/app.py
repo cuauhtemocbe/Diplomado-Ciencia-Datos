@@ -173,8 +173,7 @@ def plot_k_distance(data, threshold=0.01, quantile=0.95):
 
         if n_neighbors > 2:
             nn = NearestNeighbors(
-                n_neighbors=n_neighbors, algorithm="auto", metric="cosine",
-                n_jobs=-1
+                n_neighbors=n_neighbors, algorithm="auto", metric="cosine", n_jobs=-1
             )
             nn.fit(embeddings_matrix)
             distances, _ = nn.kneighbors(embeddings_matrix)
@@ -462,6 +461,7 @@ def index():
         sankey_graph=sankey_graph,
         scores_graph=scores_graph,
     )
+
 
 #  gunicorn -b 0.0.0.0:5000 app:app
 # http://172.20.0.2:5000/
