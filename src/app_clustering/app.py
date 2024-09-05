@@ -23,6 +23,7 @@ if os.getenv("RAILWAY_ENVIRONMENT") is None:
     load_dotenv()
 
 api_key = os.getenv("youtube_api_key")
+print(f"El valor de la variable de entorno es: {api_key[:5]}")
 
 
 def extract_video_id(url):
