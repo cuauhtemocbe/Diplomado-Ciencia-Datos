@@ -15,9 +15,11 @@ from sklearn.metrics import calinski_harabasz_score
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 
+RANDOM_STATE = 333
+
 app = Flask(__name__)
 
-if os.getenv("RAILWAY_ENVIRONMENT") is None:  # Railway establece esta variable en su entorno
+if os.getenv("RAILWAY_ENVIRONMENT") is None:
     load_dotenv()
 
 api_key = os.getenv("youtube_api_key")
@@ -176,7 +178,8 @@ def plot_k_distance(data, threshold=0.01, quantile=0.95):
 
         if n_neighbors > 2:
             nn = NearestNeighbors(
-                n_neighbors=n_neighbors, algorithm="auto", metric="cosine"
+                n_neighbors=n_neighbors, algorithm="auto", metric="cosine",
+                n_jobs=-1
             )
             nn.fit(embeddings_matrix)
             distances, _ = nn.kneighbors(embeddings_matrix)
@@ -465,6 +468,8 @@ def index():
         scores_graph=scores_graph,
     )
 
-
+#  gunicorn -b 0.0.0.0:5000 app:app
+# http://172.20.0.2:5000/
+# http://0.0.0.0:5000/
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
