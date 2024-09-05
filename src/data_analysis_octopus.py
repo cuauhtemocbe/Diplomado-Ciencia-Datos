@@ -899,7 +899,9 @@ def update_progress(progress, progress_text=""):
     print(ouput_text)
 
 
-def heatmap(data, title="Mapa de Calor", width=800, height=600, cell_width=30, cell_height=30):
+def heatmap(
+    data, title="Mapa de Calor", width=800, height=600, cell_width=30, cell_height=30
+):
     # Calcular tamaño de la figura basado en el tamaño deseado de cada celda
     fig_width = cell_width * data.shape[1]
     fig_height = cell_height * data.shape[0]
@@ -922,16 +924,16 @@ def heatmap(data, title="Mapa de Calor", width=800, height=600, cell_width=30, c
                 )
             )
 
-    # Ajustar el tamaño del gráfico y rotar etiquetas
     fig.update_layout(
         annotations=annotations,
-        xaxis=dict(tickangle=45),  # Etiquetas del eje x en horizontal
-        width=fig_width,          # Ancho del gráfico ajustado al tamaño de cada celda
-        height=fig_height,        # Alto del gráfico ajustado al tamaño de cada celda
-        margin=dict(l=0, r=0, t=50, b=0)  # Márgenes reducidos para maximizar el espacio de las celdas
+        xaxis=dict(tickangle=45),
+        width=fig_width,
+        height=fig_height,
+        margin=dict(
+            l=0, r=0, t=50, b=0
+        )
     )
 
-    # Mostrar el gráfico
     fig.show()
 
 
@@ -939,26 +941,34 @@ def reduce_cardinality(df, col, threshold=0.1):
     # Calcular la frecuencia de cada categoría en la columna especificada
     # `value_counts(normalize=True)` devuelve la proporción de cada categoría en lugar del conteo absoluto
     freq = df[col].value_counts(normalize=True)
-    
+
     # Identificar las categorías que tienen una frecuencia menor al umbral especificado
     # `freq < threshold` devuelve una serie booleana donde las categorías con frecuencia menor al umbral son True
     # `.index` obtiene los nombres de estas categorías
     low_freq_categories = freq[freq < threshold].index
-    
+
     # Agrupar las categorías que tienen una frecuencia baja en una nueva categoría llamada "Otros"
     # La función lambda reemplaza cualquier categoría en `low_freq_categories` con "Otros"
     # Las categorías con frecuencia suficiente se mantienen sin cambios
     df[col] = df[col].apply(lambda x: "Otros" if x in low_freq_categories else x)
-    
+
     return df
 
 
-def plot_heatmap_clusters(df, cluster_col="cluster", agg_func= "median", annot_fontsize=8, figsize=(12, 2)):
-  scaler = MinMaxScaler()
-  scaled_df = scaler.fit_transform(df.drop(columns=[cluster_col]))
-  scaled_df[cluster_col] = df[cluster_col]
-  aggregated_cluster = scaled_df.groupby(cluster_col).agg(agg_func).round(2)
-  plt.figure(figsize=figsize)
-  sns.heatmap(aggregated_cluster, annot=True, cmap="viridis", fmt=".2f", annot_kws={"size": annot_fontsize})
-  plt.title(f"Mapa de Calor de '{agg_func}' de Características por Clúster")
-  plt.show()
+def plot_heatmap_clusters(
+    df, cluster_col="cluster", agg_func="median", annot_fontsize=8, figsize=(12, 2)
+):
+    scaler = MinMaxScaler()
+    scaled_df = scaler.fit_transform(df.drop(columns=[cluster_col]))
+    scaled_df[cluster_col] = df[cluster_col]
+    aggregated_cluster = scaled_df.groupby(cluster_col).agg(agg_func).round(2)
+    plt.figure(figsize=figsize)
+    sns.heatmap(
+        aggregated_cluster,
+        annot=True,
+        cmap="viridis",
+        fmt=".2f",
+        annot_kws={"size": annot_fontsize},
+    )
+    plt.title(f"Mapa de Calor de '{agg_func}' de Características por Clúster")
+    plt.show()
