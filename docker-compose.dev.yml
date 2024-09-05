@@ -1,0 +1,16 @@
+services:
+  diplomado-ds:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    image: diplomado-ds:latest
+    container_name: diplomado-ds
+    command: "/bin/bash"
+    stdin_open: true
+    tty: true
+    ports:
+      - "8888:8888"
+    volumes:
+      - .:/workspace
+    env_file:
+      - .env
