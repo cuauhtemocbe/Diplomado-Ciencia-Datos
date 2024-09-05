@@ -920,7 +920,7 @@ def heatmap(
                     text=round(data.iloc[i, j]),
                     font=dict(size=8, color="white"),
                     showarrow=False,
-                    align="center"
+                    align="center",
                 )
             )
 
@@ -929,9 +929,7 @@ def heatmap(
         xaxis=dict(tickangle=45),
         width=fig_width,
         height=fig_height,
-        margin=dict(
-            l=0, r=0, t=50, b=0
-        )
+        margin=dict(l=0, r=0, t=50, b=0),
     )
 
     fig.show()
