@@ -36,13 +36,7 @@ def extract_video_id(url):
     - video_id: str, el identificador del video de YouTube.
     """
     # Expresión regular para encontrar el video_id en una URL de YouTube
-    regex = r'(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:watch\?v=|embed\/|v\/|.*[?&]v=)([^"&?\/\s]{11})'
-    match = re.search(regex, url)
-
-    if match:
-        return match.group(1)
-    else:
-        raise ValueError("No se pudo extraer el video_id de la URL proporcionada.")
+    return url.split("=")[-1]
 
 
 def get_youtube_video_details(url, api_key):
