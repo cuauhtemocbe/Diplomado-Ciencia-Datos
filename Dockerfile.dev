@@ -9,4 +9,3 @@ RUN pip install "poetry"
 RUN poetry config virtualenvs.create false
 ENV PYTHONPATH=/workspace/src:${PYTHONPATH}
 RUN poetry install --no-root
-RUN rm -R *
