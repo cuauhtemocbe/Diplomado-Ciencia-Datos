@@ -1,0 +1,8 @@
+# railway.yml
+services:
+  web:
+    dockerfilePath: ./Dockerfile  # Define la ruta al Dockerfile
+    startCommand: "gunicorn src.app_clustering.app:app --bind 0.0.0.0:$PORT"  # Comando para iniciar Gunicorn
+    envVars:
+      FLASK_ENV: "production"  # Define el entorno de Flask como producción
+      PORT: 5000  # Variable de entorno del puerto
