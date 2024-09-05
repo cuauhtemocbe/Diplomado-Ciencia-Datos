@@ -16,7 +16,10 @@ from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 
 app = Flask(__name__)
-load_dotenv()
+
+if os.getenv("RAILWAY_ENVIRONMENT") is None:  # Railway establece esta variable en su entorno
+    load_dotenv()
+
 api_key = os.getenv("youtube_api_key")
 
 
