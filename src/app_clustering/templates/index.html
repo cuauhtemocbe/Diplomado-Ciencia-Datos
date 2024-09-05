@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Análisis de Comentarios de YouTube</title>
+    <style>
+        body {
+            background-color: #121212; /* Fondo oscuro */
+            color: #e0e0e0; /* Texto claro */
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #ffffff;
+        }
+        .video-details {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #333;
+            background-color: #1e1e1e;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Análisis de Comentarios de YouTube</h1>
+        <form method="POST" action="/">
+            <label for="url">Ingrese la URL del video de YouTube:</label>
+            <input type="text" id="url" name="url" required>
+            <button type="submit">Analizar</button>
+        </form>
+        {% if video_details %}
+            <div class="video-details">
+                <h2>Detalles del Video</h2>
+                <p><strong>Nombre del video:</strong> {{ video_details.title }}</p>
+                <p><strong>Canal:</strong> {{ video_details.channel_title }}</p>
+                <p><strong>Número de vistas:</strong> {{ video_details.view_count }}</p>
+                <p><strong>Número de comentarios:</strong> {{ video_details.comment_count }}</p>
+            </div>
+        {% endif %}
+        {% if k_distance_graph %}
+            <h2>Gráfico de k-Distancias</h2>
+            <div>{{ k_distance_graph | safe }}</div>
+        {% endif %}
+        {% if scores_graph %}
+            <h2>Gráfico de Scores</h2>
+            <div>{{ scores_graph | safe }}</div>
+        {% endif %}
+        {% if sankey_graph %}
+            <h2>Gráfico de Sankey</h2>
+            <div>{{ sankey_graph | safe }}</div>
+        {% endif %}
+    </div>
+</body>
+</html>
