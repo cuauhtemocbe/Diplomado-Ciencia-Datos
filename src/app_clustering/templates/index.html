@@ -24,13 +24,19 @@
             border: 1px solid #333;
             background-color: #1e1e1e;
         }
+        h2 {
+            font-size: 20px;
+            color: gray;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Análisis de Comentarios de YouTube</h1>
+        <h2>by Cuauhtémoc Bautista</h2>
         <form method="POST" action="/">
-            <label for="url">Ingrese la URL del video de YouTube:</label>
+            <label for="url">Ingresa una URL de un video de YouTube:</label>
             <input type="text" id="url" name="url" required>
             <button type="submit">Analizar</button>
         </form>
@@ -41,7 +47,18 @@
                 <p><strong>Canal:</strong> {{ video_details.channel_title }}</p>
                 <p><strong>Número de vistas:</strong> {{ video_details.view_count }}</p>
                 <p><strong>Número de comentarios:</strong> {{ video_details.comment_count }}</p>
+                <p><strong>Comentarios positivos:</strong> {{ sentiment_count.positivo }}</p>
+                <p><strong>Comentarios negativos:</strong> {{ sentiment_count.negativo }}</p>
+                <p><strong>Comentarios neutros:</strong> {{ sentiment_count.neutro }}</p>
             </div>
+        {% endif %}
+        <!-- {% if wordcloud_path %}
+            <h2>Nube de palabras</h2>
+            <img src={{wordcloud_path}} alt="Nube de Palabras" width="800" height="400">
+        {% endif %} -->
+        {% if sentiment_daily_graph %}
+            <h2>Evolución comentarios por sentimiento</h2>
+            <div>{{ sentiment_daily_graph | safe }}</div>
         {% endif %}
         {% if k_distance_graph %}
             <h2>Gráfico de k-Distancias</h2>
