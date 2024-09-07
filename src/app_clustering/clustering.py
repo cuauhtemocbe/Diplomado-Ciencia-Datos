@@ -1,41 +1,32 @@
-from transformers import pipeline
 import os
 import re
 import unicodedata
 from collections import Counter
 
-import app_clustering.app as clustering
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import plotly.io as pio
 import umap
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template, request
 from googleapiclient.discovery import build
+from plotly.subplots import make_subplots
 from scipy.spatial.distance import cosine
 from sentence_transformers import SentenceTransformer
 from sklearn import set_config
 from sklearn.cluster import AgglomerativeClustering
-from sklearn.metrics import calinski_harabasz_score
+from sklearn.metrics import (calinski_harabasz_score, pairwise_distances,
+                             silhouette_score)
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 from transformers import pipeline
 from wordcloud import WordCloud
-from sklearn.metrics import (
-    calinski_harabasz_score,
-    pairwise_distances,
-    silhouette_score,
-)
 
 if os.getenv("RAILWAY_ENVIRONMENT") is None:
     load_dotenv()
 
 api_key = os.getenv("youtube_api_key")
-
-app = Flask(__name__)
 
 RANDOM_STATE = 333
 
@@ -754,54 +745,90 @@ def plot_sankey(labels, source, target, values, comments, width=None, height=Non
     return fig
 
 
-def plot_clustering_metric(scores, metric):
+def plot_clustering_metric(silhouette_scores, calinski_scores):
     """
-    Genera un gráfico que muestra el puntaje especificado frente a los umbrales de distancia.
+    Genera un gráfico que muestra los puntajes de silhouette y Calinski-Harabasz frente a los umbrales de distancia,
+    con dos ejes Y diferentes y marca el umbral con el mejor puntaje de silhouette.
 
     Args:
-        scores (dict): Un diccionario donde las claves son umbrales de distancia
-                       y los valores son puntajes correspondientes para la métrica especificada.
-        metric (str): La métrica a graficar. Puede ser "calinski" o "silhouette".
+        silhouette_scores (dict): Un diccionario donde las claves son umbrales de distancia
+                                  y los valores son puntajes de silhouette correspondientes.
+        calinski_scores (dict): Un diccionario donde las claves son umbrales de distancia
+                                y los valores son puntajes de Calinski-Harabasz correspondientes.
 
     Returns:
         fig (plotly.graph_objects.Figure): Un objeto Figure de Plotly con el gráfico generado.
     """
-    if metric not in ["calinski", "silhouette"]:
-        raise ValueError("El argumento 'metric' debe ser 'calinski' o 'silhouette'.")
+    # Obtener los umbrales de distancia y puntajes
+    silhouette_thresholds = sorted(silhouette_scores.keys())
+    silhouette_metric_scores = [silhouette_scores[t] for t in silhouette_thresholds]
+    
+    calinski_thresholds = sorted(calinski_scores.keys())
+    calinski_metric_scores = [calinski_scores[t] for t in calinski_thresholds]
 
-    # Extraer umbrales de distancia y puntajes
-    threshold_distances = sorted(scores.keys())
-    metric_scores = [scores[t] for t in threshold_distances]
+    # Determinar el mejor umbral basado en el puntaje más alto de silhouette
+    best_threshold = max(silhouette_scores, key=silhouette_scores.get)
+    
+    # Crear el gráfico con dos ejes Y
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
 
-    # Crear el gráfico
-    fig = go.Figure(
+    # Añadir la traza para el puntaje de silhouette
+    fig.add_trace(
         go.Scatter(
-            x=threshold_distances,
-            y=metric_scores,
+            x=silhouette_thresholds,
+            y=silhouette_metric_scores,
             mode="lines+markers",
-            name=f"{metric.capitalize()} Score",
-            marker=dict(color="blue" if metric == "calinski" else "red", size=10),
-            line=dict(color="blue" if metric == "calinski" else "red", width=2),
+            name="Silhouette Score",
+            marker=dict(color="red", size=10),
+            line=dict(color="red", width=2),
             text=[
-                f"Threshold: {t}<br>{metric.capitalize()} Score: {s}"
-                for t, s in zip(threshold_distances, metric_scores)
+                f"Threshold: {t}<br>Silhouette Score: {s}"
+                for t, s in zip(silhouette_thresholds, silhouette_metric_scores)
             ],
             hoverinfo="text",
-        )
+        ),
+        secondary_y=False  # Eje Y izquierdo
     )
 
-    # Configurar diseño del gráfico
+    # Añadir la traza para el puntaje de Calinski-Harabasz
+    fig.add_trace(
+        go.Scatter(
+            x=calinski_thresholds,
+            y=calinski_metric_scores,
+            mode="lines+markers",
+            name="Calinski-Harabasz Score",
+            marker=dict(color="blue", size=10),
+            line=dict(color="blue", width=2),
+            text=[
+                f"Threshold: {t}<br>Calinski-Harabasz Score: {s}"
+                for t, s in zip(calinski_thresholds, calinski_metric_scores)
+            ],
+            hoverinfo="text",
+        ),
+        secondary_y=True  # Eje Y derecho
+    )
+
+    # Añadir una línea vertical para el mejor umbral
+    fig.add_vline(
+        x=best_threshold,
+        line=dict(color="green", width=2, dash="dash"),
+        annotation_text=f"Best Threshold: {best_threshold}",
+        annotation_position="top right",
+    )
+
+    # Configurar el diseño del gráfico
     fig.update_layout(
-        title=f"{metric.capitalize()} Score vs. Threshold Distance",
+        title="Clustering Metrics vs. Threshold Distance",
         xaxis_title="Threshold Distance",
-        yaxis_title=f"{metric.capitalize()} Score",
+        yaxis_title="Silhouette Score",
+        yaxis2_title="Calinski-Harabasz Score",
         font=dict(size=12),
         width=800,
         height=600,
         template="plotly_dark",
     )
 
-    return fig
+    return fig, best_threshold
 
 
 classifier = pipeline(
@@ -842,6 +869,41 @@ def classify_sentiment_df(data, comment_col="comment"):
     data["sentimiento"], data["confianza"] = zip(*data[comment_col].apply(classify_sentiment))
     
     return data 
+
+
+def transform_embeddings(data, embeddings_col="embeddings", n_components=3, random_seed=42):
+    # Convertir embeddings a matriz numpy
+    embeddings_matrix = np.array(data[embeddings_col].tolist())
+    
+    # Aplicar UMAP para reducción de dimensionalidad
+    umap_model = umap.UMAP(n_components=n_components, random_state=random_seed, metric="cosine")
+    data_umap = umap_model.fit_transform(embeddings_matrix)
+    
+    # Calcular distancias y percentiles para determinar min_eps y max_eps
+    distances = pairwise_distances(data_umap, metric="cosine")
+    min_eps = np.percentile(distances, 10)
+    max_eps = np.percentile(distances, 50)
+    
+
+    umap_data = pd.DataFrame({'embeddings': [embedding.tolist() for embedding in data_umap]})
+    umap_data["comment"] = data["comment"]
+    
+    return umap_data, min_eps, max_eps
+
+
+def determine_min_items_by_cluster(total):
+    """
+    """
+    if total < 50:
+        min_items_by_cluster = 1
+    elif total < 100:
+        min_items_by_cluster = 5
+    elif total < 500:
+        min_items_by_cluster = 10
+    else:
+        min_items_by_cluster = int(round(total * 0.01, 2))
+    
+    return min_items_by_cluster
 
 
 def main(): ...
