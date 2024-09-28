@@ -16,8 +16,11 @@ from scipy.spatial.distance import cosine
 from sentence_transformers import SentenceTransformer
 from sklearn import set_config
 from sklearn.cluster import AgglomerativeClustering
-from sklearn.metrics import (calinski_harabasz_score, pairwise_distances,
-                             silhouette_score)
+from sklearn.metrics import (
+    calinski_harabasz_score,
+    pairwise_distances,
+    silhouette_score,
+)
 from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 from transformers import pipeline
@@ -181,7 +184,7 @@ def remove_stopwords(text, stopwords):
 
 
 def plot_wordcloud(data, text_column, output_filename=None):
-    text = ' '.join(data[text_column])
+    text = " ".join(data[text_column])
 
     stopwords_set = set(stopwords_es)
 
@@ -200,8 +203,9 @@ def plot_wordcloud(data, text_column, output_filename=None):
     plt.axis("off")
 
     if output_filename:
-        plt.savefig(output_filename, format='png')
+        plt.savefig(output_filename, format="png")
         plt.close()
+        return output_filename
 
 
 def extract_video_id(url):
@@ -215,7 +219,13 @@ def extract_video_id(url):
     - video_id: str, el identificador del video de YouTube.
     """
     # Expresión regular para encontrar el video_id en una URL de YouTube
-    return url.split("=")[-1]
+    pattern = r"(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/)([a-zA-Z0-9_-]{11})"
+    match = re.search(pattern, url)
+
+    if match:
+        return match.group(1)
+    else:
+        raise ValueError("No se pudo encontrar un ID de video en la URL proporcionada.")
 
 
 def get_youtube_video_details(url, api_key):
@@ -762,13 +772,13 @@ def plot_clustering_metric(silhouette_scores, calinski_scores):
     # Obtener los umbrales de distancia y puntajes
     silhouette_thresholds = sorted(silhouette_scores.keys())
     silhouette_metric_scores = [silhouette_scores[t] for t in silhouette_thresholds]
-    
+
     calinski_thresholds = sorted(calinski_scores.keys())
     calinski_metric_scores = [calinski_scores[t] for t in calinski_thresholds]
 
     # Determinar el mejor umbral basado en el puntaje más alto de silhouette
     best_threshold = max(silhouette_scores, key=silhouette_scores.get)
-    
+
     # Crear el gráfico con dos ejes Y
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
@@ -787,7 +797,7 @@ def plot_clustering_metric(silhouette_scores, calinski_scores):
             ],
             hoverinfo="text",
         ),
-        secondary_y=False  # Eje Y izquierdo
+        secondary_y=False,  # Eje Y izquierdo
     )
 
     # Añadir la traza para el puntaje de Calinski-Harabasz
@@ -805,7 +815,7 @@ def plot_clustering_metric(silhouette_scores, calinski_scores):
             ],
             hoverinfo="text",
         ),
-        secondary_y=True  # Eje Y derecho
+        secondary_y=True,  # Eje Y derecho
     )
 
     # Añadir una línea vertical para el mejor umbral
@@ -847,12 +857,9 @@ def map_sentiment(estrella):
         return "positivo"
 
 
-
 def classify_sentiment(texto):
     resultado = classifier(texto)[0]
-    sentimiento = map_sentiment(
-        resultado["label"]
-    ) 
+    sentimiento = map_sentiment(resultado["label"])
     return (
         sentimiento,
         resultado["score"],
@@ -860,40 +867,46 @@ def classify_sentiment(texto):
 
 
 def classify_sentiment_df(data, comment_col="comment"):
-    
+
     def classify_sentiment(texto):
         resultado = classifier(texto)[0]
         sentimiento = map_sentiment(resultado["label"])
         return sentimiento, resultado["score"]
 
-    data["sentimiento"], data["confianza"] = zip(*data[comment_col].apply(classify_sentiment))
-    
-    return data 
+    data["sentimiento"], data["confianza"] = zip(
+        *data[comment_col].apply(classify_sentiment)
+    )
+
+    return data
 
 
-def transform_embeddings(data, embeddings_col="embeddings", n_components=3, random_seed=42):
+def transform_embeddings(
+    data, embeddings_col="embeddings", n_components=3, random_seed=42
+):
     # Convertir embeddings a matriz numpy
     embeddings_matrix = np.array(data[embeddings_col].tolist())
-    
+
     # Aplicar UMAP para reducción de dimensionalidad
-    umap_model = umap.UMAP(n_components=n_components, random_state=random_seed, metric="cosine")
+    umap_model = umap.UMAP(
+        n_components=n_components, random_state=random_seed, metric="cosine"
+    )
     data_umap = umap_model.fit_transform(embeddings_matrix)
-    
+
     # Calcular distancias y percentiles para determinar min_eps y max_eps
     distances = pairwise_distances(data_umap, metric="cosine")
     min_eps = np.percentile(distances, 10)
     max_eps = np.percentile(distances, 50)
-    
 
-    umap_data = pd.DataFrame({'embeddings': [embedding.tolist() for embedding in data_umap]})
+    umap_data = pd.DataFrame(
+        {"embeddings": [embedding.tolist() for embedding in data_umap]}
+    )
     umap_data["comment"] = data["comment"]
-    
+
     return umap_data, min_eps, max_eps
 
 
 def determine_min_items_by_cluster(total):
-    """
-    """
+    """ """
     if total < 50:
         min_items_by_cluster = 1
     elif total < 100:
@@ -902,7 +915,7 @@ def determine_min_items_by_cluster(total):
         min_items_by_cluster = 10
     else:
         min_items_by_cluster = int(round(total * 0.01, 2))
-    
+
     return min_items_by_cluster
 
 
