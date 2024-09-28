@@ -9,7 +9,7 @@ services:
     stdin_open: true
     tty: true
     ports:
-      - "8888:8888"
+      - "8889:8888"
     volumes:
       - .:/workspace
     env_file:
