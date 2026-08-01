@@ -13,12 +13,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import plotly.express as px
-import plotly.io as pio
 import plotly.graph_objects as go
-import scipy.stats as stats
 import seaborn as sns
-from IPython.display import clear_output
-from joblib import Parallel, delayed
+from IPython.display import clear_output, display
 from scipy.sparse import csr_matrix
 from sklearn import metrics
 from sklearn.base import BaseEstimator, TransformerMixin, clone
@@ -32,7 +29,6 @@ from sklearn.model_selection import (
     GridSearchCV,
     StratifiedKFold,
     cross_val_score,
-    train_test_split,
 )
 from sklearn.naive_bayes import ComplementNB, GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
@@ -40,8 +36,6 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import (
     MinMaxScaler,
     OneHotEncoder,
-    RobustScaler,
-    StandardScaler,
 )
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
@@ -284,9 +278,9 @@ class DataViz:
         plt.show()
 
 
-def check_time_format(time_str, format="%m/%d/%Y"):
+def check_time_format(time_str, date_format="%m/%d/%Y"):
     try:
-        datetime.strptime(str(time_str), format)
+        datetime.strptime(str(time_str), date_format)
         return True
     except ValueError:
         return False
@@ -608,7 +602,7 @@ def test_report(model, X_test, y_test, verbose):
         y_prob = model.predict_proba(X_test)[:, 1]
         roc_auc_test = round(roc_auc_score(y_test, y_prob), 2)
 
-    except:
+    except Exception:
         roc_auc_test = np.nan
 
     if verbose:

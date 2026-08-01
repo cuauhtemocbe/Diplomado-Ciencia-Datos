@@ -38,6 +38,7 @@ black = "^24.4.2"
 xgboost = "^2.0.3"
 nltk = "^3.8.1"
 isort = "^5.13.2"
+pylint = "^3.2.0"
 wfdb = "^4.1.2"
 neurokit2 = "^0.2.9"
 pyproj = "^3.6.1"
@@ -49,6 +50,53 @@ umap-learn = "^0.5.6"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pylint."messages control"]
+# This repo is exploratory/educational data-science code (notebooks +
+# supporting src/ modules), not a production service — several default
+# pylint checks fight conventions that are standard in that context
+# rather than catching real bugs. Disabled deliberately, not by default:
+#   - invalid-name: X_train/X_test/X/Q1/Q3/IQR are scikit-learn/stats
+#     convention, not a naming-style violation.
+#   - missing-*-docstring / empty-docstring: most functions here are
+#     short, single-purpose analysis helpers; low value for this repo.
+#   - line-too-long: plotting/pandas chains are frequently long one-liners.
+#   - too-many-arguments/positional-arguments/locals: inherent to
+#     multi-parameter ML pipeline functions, not a sign of bad design here.
+#   - use-dict-literal: dict(...) is idiomatic in plotly's own API surface.
+#   - unused-variable/unused-argument: common in exploratory code
+#     (discarded plot handles, callback-required signatures).
+#   - redefined-outer-name: parameters intentionally shadowing a
+#     module-level default (e.g. api_key) is an explicit-dependency
+#     pattern, not a bug.
+#   - broad-exception-caught: acceptable for top-level notebook/app
+#     error handling in a solo-maintainer project.
+disable = [
+    "invalid-name",
+    "missing-module-docstring",
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "empty-docstring",
+    "line-too-long",
+    "consider-using-f-string",
+    "consider-using-dict-items",
+    "trailing-whitespace",
+    "missing-final-newline",
+    "consider-using-from-import",
+    "too-many-arguments",
+    "too-many-locals",
+    "too-many-positional-arguments",
+    "no-else-return",
+    "inconsistent-return-statements",
+    "unnecessary-comprehension",
+    "use-dict-literal",
+    "unnecessary-lambda",
+    "attribute-defined-outside-init",
+    "unused-variable",
+    "unused-argument",
+    "redefined-outer-name",
+    "broad-exception-caught",
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
