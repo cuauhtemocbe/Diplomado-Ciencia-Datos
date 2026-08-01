@@ -51,6 +51,12 @@ umap-learn = "^0.5.6"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.pylint.main]
+# Matches pytest's own pythonpath config (see [tool.pytest.ini_options]
+# below) — without this, pylint can't resolve `from app_clustering import
+# clustering` since app_clustering/ lives under src/, not the repo root.
+source-roots = ["src"]
+
 [tool.pylint."messages control"]
 # This repo is exploratory/educational data-science code (notebooks +
 # supporting src/ modules), not a production service — several default
@@ -71,6 +77,14 @@ build-backend = "poetry.core.masonry.api"
 #     pattern, not a bug.
 #   - broad-exception-caught: acceptable for top-level notebook/app
 #     error handling in a solo-maintainer project.
+#   - no-member: googleapiclient's `Resource` objects (youtube.videos(),
+#     youtube.commentThreads()) are built dynamically at runtime from a
+#     discovery document, not real classes pylint can introspect.
+#   - arguments-differ: scikit-learn transformer subclasses idiomatically
+#     narrow TransformerMixin's generic fit_transform signature.
+#   - duplicate-code: the one flagged instance is a shared tuple-unpacking
+#     call convention between app.py's view and clustering.py's own
+#     return, not accidental copy-paste logic.
 disable = [
     "invalid-name",
     "missing-module-docstring",
@@ -96,6 +110,9 @@ disable = [
     "unused-argument",
     "redefined-outer-name",
     "broad-exception-caught",
+    "no-member",
+    "arguments-differ",
+    "duplicate-code",
 ]
 
 [tool.pytest.ini_options]
