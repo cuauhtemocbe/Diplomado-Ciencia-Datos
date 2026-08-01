@@ -25,46 +25,33 @@ La instalación de Visual Studio Code es opcional, pero se recomienda especialme
     ```
     Este comando creará una carpeta llamada **Diplomado-Ciencia-Datos** en tu máquina.
 
-2. ⚠️**Importante :⚠️** Crear un archivo `.env` dentro de la carpeta **DataScience-Docker**
+2. ⚠️**Importante:⚠️** Crear un archivo `.env` en la raíz del repositorio (junto a este README). Solo lo necesita el servicio de producción `api-clustering` (variable `youtube_api_key`) — no hace falta para correr los notebooks.
 
-### Configuración con Visual Studio Code (Opción Avanzada)
+### Levantar el entorno con Docker (`make`)
 
-Si prefieres usar Visual Studio Code para desarrollar o ejecutar los notebooks, sigue estos pasos:
+Todo el flujo corre en Docker, sin depender de un editor específico. `make help` lista todos los comandos disponibles.
 
-1. Abre Visual Studio Code y selecciona `File > Open Folder`. Luego elige la carpeta **Diplomado-Ciencia-Datos** para abrir el repositorio.
-2. Instala la extensión **Dev Containers** desde el Marketplace de VSC.
-3. Abre la Paleta de Comandos (Command Palette) con `Shift + Ctrl + P` y escribe `Dev Containers: Rebuild and Reopen in Container`. Ejecútalo para construir y levantar el contenedor Docker.
-4. En el explorador de archivos (`Ctrl + Shift + E`), navega hasta la carpeta `notebooks` y abre el archivo `0-Hello-Pandas.ipynb`.
-5. Ejecuta la primer celda; al inicio te solicitará seleccionar un kernel, elige Python 3.12.3.
-6. Disfruta
-
-### Configuración con Jupyter Lab (Opción Sencilla)
-
-Si prefieres utilizar Jupyter Lab con Docker, sigue estos pasos:
-
-1. Desde la terminal, dentro de la carpeta **Diplomado-Ciencia-Datos**, ejecuta el siguiente comando para construir y levantar el contenedor:
+1. Desde la terminal, dentro de la carpeta **Diplomado-Ciencia-Datos**, levanta el contenedor de desarrollo:
 
     ```bash
-    docker compose up -d
+    make up
     ```
 
-2. Luego, ejecuta el siguiente comando para ingresar al contenedor y utilizar la terminal:
+2. Inicia Jupyter Lab dentro del contenedor:
 
     ```bash
-    docker exec -it diplomado-ds bash
+    make jupyter
     ```
 
-3. Dentro del contenedor, inicia el servicio de Jupyter Lab con el siguiente comando:
+3. Abre el siguiente enlace en tu navegador: [http://localhost:8889/lab/tree/notebooks](http://localhost:8889/lab/tree/notebooks)
 
-    ```bash
-    jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=''
-    ```
+4. Navega en el explorador a la carpeta notebooks, y abre el notebook `0-Hello-Pandas.ipynb`.
 
-4. Abre el siguiente enlace en tu navegador: [http://localhost:8888/lab/tree/notebooks](http://localhost:8888/lab/tree/notebooks)
+5. Disfruta. Cuando termines, `make down` detiene el contenedor.
 
-5. Navega en el explorador a la carpeta notebooks, y abre prueba el notebook `0-Hello-Pandas.ipynb`.
+Si además quieres correr localmente el servicio de producción (`api-clustering`), usa `make prod-up` / `make prod-down`.
 
-6. Disfruta.
+Si prefieres usar Visual Studio Code para editar los notebooks, ábrelo directamente sobre esta carpeta (`File > Open Folder`) — no requiere ninguna extensión ni configuración especial; sigue corriendo Jupyter vía `make jupyter` como arriba.
 
 ## Enlaces de Interés
 
