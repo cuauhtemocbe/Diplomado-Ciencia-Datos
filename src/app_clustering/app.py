@@ -1,14 +1,12 @@
+import logging
 import os
-import re
 
-import app_clustering.app as clustering
 import pandas as pd
 import plotly.io as pio
-import umap
-from app_clustering import clustering
 from dotenv import load_dotenv
-from flask import Flask, jsonify, render_template, request
-import logging
+from flask import Flask, render_template, request
+
+from app_clustering import clustering
 
 if os.getenv("RAILWAY_ENVIRONMENT") is None:
     load_dotenv()

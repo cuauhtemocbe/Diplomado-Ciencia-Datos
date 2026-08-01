@@ -1,12 +1,10 @@
 import os
 import re
 import unicodedata
-from collections import Counter
 
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import plotly.express as px
 import plotly.graph_objects as go
 import umap
 from dotenv import load_dotenv
@@ -14,7 +12,6 @@ from googleapiclient.discovery import build
 from plotly.subplots import make_subplots
 from scipy.spatial.distance import cosine
 from sentence_transformers import SentenceTransformer
-from sklearn import set_config
 from sklearn.cluster import AgglomerativeClustering
 from sklearn.metrics import (
     calinski_harabasz_score,
@@ -356,8 +353,8 @@ def plot_k_distance(data, threshold=0.01, quantile=0.95):
     # embeddings_matrix = np.array(data["embeddings"].tolist())
     embeddings_matrix = data.copy()
 
-    for threshold in [threshold, 0.05, 0.1, 0.2]:
-        min_samples = int(round(data.shape[0] * threshold, 0))
+    for thresh in [threshold, 0.05, 0.1, 0.2]:
+        min_samples = int(round(data.shape[0] * thresh, 0))
         n_neighbors = min_samples - 1
 
         if n_neighbors > 2:
@@ -868,13 +865,13 @@ def classify_sentiment(texto):
 
 def classify_sentiment_df(data, comment_col="comment"):
 
-    def classify_sentiment(texto):
+    def classify_sentiment_row(texto):
         resultado = classifier(texto)[0]
         sentimiento = map_sentiment(resultado["label"])
         return sentimiento, resultado["score"]
 
     data["sentimiento"], data["confianza"] = zip(
-        *data[comment_col].apply(classify_sentiment)
+        *data[comment_col].apply(classify_sentiment_row)
     )
 
     return data
