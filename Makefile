@@ -3,7 +3,7 @@
 COMPOSE := docker compose -f docker-compose.dev.yml
 SERVICE := diplomado-ds
 
-.PHONY: help build up down shell jupyter lint test verify-build jupyter-local lint-local test-local prod-up prod-down
+.PHONY: help build up down shell jupyter lint test verify-build verify-groups jupyter-local lint-local test-local prod-up prod-down
 
 help: ## Mostrar esta ayuda
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}'
@@ -32,6 +32,9 @@ test: up ## Correr pytest dentro del contenedor
 
 verify-build: ## Validar contexto de build, cache de poetry install y ausencia de .env en la imagen (issue #12)
 	./scripts/verify-build-context.sh
+
+verify-groups: ## Validar que cada grupo de Poetry instala e importa lo que necesita, aislado (issue #13)
+	./scripts/verify-poetry-groups.sh
 
 jupyter-local: ## Iniciar Jupyter Lab con Poetry, sin Docker
 	poetry run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token=''

@@ -17,7 +17,9 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip poetry
-        poetry install --no-root
+        # nlp group is needed so src/app_clustering/*.py (sentence-transformers,
+        # flask, wordcloud) doesn't fail pylint's import-error check.
+        poetry install --no-root --with nlp
     - name: Analysing the code with pylint
       run: |
         poetry run pylint $(git ls-files '*.py')

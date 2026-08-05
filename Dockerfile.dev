@@ -8,5 +8,9 @@ RUN pip install "poetry"
 RUN poetry config virtualenvs.create false
 ENV PYTHONPATH=/workspace/src:${PYTHONPATH}
 COPY pyproject.toml poetry.lock ./
+# Core group only for now -- notebook-cluster groups (tensorflow/nlp/geo/
+# extras) are installed on demand via `poetry install --with <group>` inside
+# the running container as a given notebook needs them. #14 replaces this
+# with one multi-stage target per group, pre-installed.
 RUN poetry install --no-root
 COPY . .
