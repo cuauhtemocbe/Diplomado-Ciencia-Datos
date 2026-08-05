@@ -20,6 +20,8 @@ jobs:
         # nlp group is needed so src/app_clustering/*.py (sentence-transformers,
         # flask, wordcloud) doesn't fail pylint's import-error check.
         poetry install --no-root --with nlp
+    - name: Verificar que poetry.lock esté sincronizado
+      run: poetry check --lock
     - name: Analysing the code with pylint
       run: |
         poetry run pylint $(git ls-files '*.py')

@@ -2,7 +2,6 @@
 .mypy_cache
 __pycache__
 .env
-poetry.lock
 .ipynb_checkpoints
 notebooks-profesores/
 .claude/
