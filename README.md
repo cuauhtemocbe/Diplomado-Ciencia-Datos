@@ -10,7 +10,8 @@ Antes de comenzar, asegúrate de tener instalados los siguientes programas:
 
 1. **Docker**: [Guía de instalación de Docker](https://docs.docker.com/engine/install/)
 2. **Git**: [Guía de instalación de Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-3. **Visual Studio Code (VSC)**: [Descargar Visual Studio Code](https://code.visualstudio.com/download)
+3. **Make**: viene preinstalado en Linux/macOS; en Windows usá WSL o Git Bash.
+4. **Visual Studio Code (VSC)**: [Descargar Visual Studio Code](https://code.visualstudio.com/download)
 
 La instalación de Visual Studio Code es opcional, pero se recomienda especialmente si tienes experiencia programando. Si eres principiante, puedes optar por no instalarlo.
 
@@ -52,6 +53,8 @@ Todo el flujo corre en Docker, sin depender de un editor específico. `make help
 Si además quieres correr localmente el servicio de producción (`api-clustering`), usa `make prod-up` / `make prod-down`.
 
 Si prefieres usar Visual Studio Code para editar los notebooks, ábrelo directamente sobre esta carpeta (`File > Open Folder`) — no requiere ninguna extensión ni configuración especial; sigue corriendo Jupyter vía `make jupyter` como arriba.
+
+Para contribuir código a `src/`, `make lint` y `make test` corren pylint/pytest dentro del contenedor con el mismo comando que usa CI, así no hay diferencia entre "pasa en mi máquina" y "pasa en CI".
 
 ## Enlaces de Interés
 
