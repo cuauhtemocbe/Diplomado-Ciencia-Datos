@@ -11,7 +11,7 @@ IMAGE=diplomado-ds:verify-build-context
 MAX_CONTEXT_KB=5120 # 5MB
 
 echo "==> Building once to warm the cache"
-docker build -f Dockerfile.dev -t "$IMAGE" . >/tmp/build-context-verify-1.log 2>&1
+docker build -f Dockerfile.dev --target core -t "$IMAGE" . >/tmp/build-context-verify-1.log 2>&1
 
 context_raw=$(grep -Eo 'transferring context: [0-9.]+[kKmMgG]?B' /tmp/build-context-verify-1.log | tail -1 | grep -Eo '[0-9.]+[kKmMgG]?B')
 if [ -z "$context_raw" ]; then
@@ -44,7 +44,7 @@ fi
 
 echo "==> Touching a notebook and rebuilding to check the poetry install layer is cached"
 touch notebooks/0-Hello-Pandas.ipynb
-docker build -f Dockerfile.dev -t "$IMAGE" . >/tmp/build-context-verify-2.log 2>&1
+docker build -f Dockerfile.dev --target core -t "$IMAGE" . >/tmp/build-context-verify-2.log 2>&1
 
 if grep -q "RUN poetry install --no-root" /tmp/build-context-verify-2.log && \
    grep -A1 "RUN poetry install --no-root" /tmp/build-context-verify-2.log | grep -qi "CACHED"; then
