@@ -7,3 +7,4 @@ poetry.lock
 notebooks-profesores/
 .claude/
 CLAUDE.md
+.vscode/
