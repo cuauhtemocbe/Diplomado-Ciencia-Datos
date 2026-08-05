@@ -1,0 +1,15 @@
+.git
+data
+results
+resouces
+notebooks
+.pytest_cache
+.mypy_cache
+__pycache__
+.ipynb_checkpoints
+.env
+.vscode
+.claude
+.codegraph
+specs
+README.md
