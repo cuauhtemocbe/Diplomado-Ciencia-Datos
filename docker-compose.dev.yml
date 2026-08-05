@@ -1,16 +1,101 @@
 services:
-  diplomado-ds:
+  diplomado-core:
     build:
       context: .
       dockerfile: Dockerfile.dev
       target: core
-    image: diplomado-ds:latest
-    container_name: diplomado-ds
+    image: diplomado-ds:core
+    container_name: diplomado-core
     command: "/bin/bash"
     stdin_open: true
     tty: true
     ports:
       - "8889:8888"
+    volumes:
+      - .:/workspace
+    env_file:
+      - .env
+
+  diplomado-tensorflow:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: tensorflow-env
+    image: diplomado-ds:tensorflow-env
+    container_name: diplomado-tensorflow
+    command: "/bin/bash"
+    stdin_open: true
+    tty: true
+    ports:
+      - "8890:8888"
+    volumes:
+      - .:/workspace
+    env_file:
+      - .env
+
+  diplomado-nlp:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: nlp-env
+    image: diplomado-ds:nlp-env
+    container_name: diplomado-nlp
+    command: "/bin/bash"
+    stdin_open: true
+    tty: true
+    ports:
+      - "8891:8888"
+    volumes:
+      - .:/workspace
+    env_file:
+      - .env
+
+  diplomado-geo:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: geo-env
+    image: diplomado-ds:geo-env
+    container_name: diplomado-geo
+    command: "/bin/bash"
+    stdin_open: true
+    tty: true
+    ports:
+      - "8892:8888"
+    volumes:
+      - .:/workspace
+    env_file:
+      - .env
+
+  diplomado-bio:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: bio-env
+    image: diplomado-ds:bio-env
+    container_name: diplomado-bio
+    command: "/bin/bash"
+    stdin_open: true
+    tty: true
+    ports:
+      - "8893:8888"
+    volumes:
+      - .:/workspace
+    env_file:
+      - .env
+
+  diplomado-explain:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: explain-env
+    image: diplomado-ds:explain-env
+    container_name: diplomado-explain
+    command: "/bin/bash"
+    stdin_open: true
+    tty: true
+    ports:
+      - "8894:8888"
     volumes:
       - .:/workspace
     env_file:
