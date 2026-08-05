@@ -36,7 +36,12 @@ import pytest
 from tests.test_notebook_dependencies import NOTEBOOK_DEPENDENCIES
 
 NOTEBOOKS_DIR = Path(__file__).resolve().parent.parent / "notebooks"
-SRC_PATH = Path(__file__).resolve().parent.parent / "src" / "data_analysis_octopus.py"
+SRC_PATH = (
+    Path(__file__).resolve().parent.parent
+    / "src"
+    / "data_analysis_octopus"
+    / "__init__.py"
+)
 
 CONVERTED_NOTEBOOKS = [
     "2-Cardiotocography",
