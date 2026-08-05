@@ -26,7 +26,7 @@ La instalación de Visual Studio Code es opcional, pero se recomienda especialme
     ```
     Este comando creará una carpeta llamada **Diplomado-Ciencia-Datos** en tu máquina.
 
-2. ⚠️**Importante:⚠️** Crear un archivo `.env` en la raíz del repositorio (junto a este README). Solo lo necesita el servicio de producción `api-clustering` (variable `youtube_api_key`) — no hace falta para correr los notebooks.
+2. ⚠️**Importante:⚠️** Crear un archivo `.env` en la raíz del repositorio (junto a este README). Solo lo necesitan los notebooks/módulos que usan la YouTube API (variable `youtube_api_key`) — puede quedar vacío para el resto.
 
 ### Levantar el entorno con Docker (`make`)
 
@@ -49,8 +49,6 @@ Todo el flujo corre en Docker, sin depender de un editor específico. `make help
 4. Navega en el explorador a la carpeta notebooks, y abre el notebook `0-Hello-Pandas.ipynb`.
 
 5. Disfruta. Cuando termines, `make down` detiene el contenedor.
-
-Si además quieres correr localmente el servicio de producción (`api-clustering`), usa `make prod-up` / `make prod-down`.
 
 Si prefieres usar Visual Studio Code para editar los notebooks, ábrelo directamente sobre esta carpeta (`File > Open Folder`) — no requiere ninguna extensión ni configuración especial; sigue corriendo Jupyter vía `make jupyter` como arriba.
 

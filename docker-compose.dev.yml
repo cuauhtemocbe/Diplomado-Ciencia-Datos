@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      target: core
     image: diplomado-ds:latest
     container_name: diplomado-ds
     command: "/bin/bash"

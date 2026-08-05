@@ -1,4 +1,4 @@
-FROM python:3.12.6-slim
+FROM python:3.12.6-slim AS base
 RUN mkdir workspace
 WORKDIR /workspace
 RUN apt-get update && \
@@ -8,9 +8,46 @@ RUN pip install "poetry"
 RUN poetry config virtualenvs.create false
 ENV PYTHONPATH=/workspace/src:${PYTHONPATH}
 COPY pyproject.toml poetry.lock ./
-# Core group only for now -- notebook-cluster groups (tensorflow/nlp/geo/
-# bio/explain) are installed on demand via `poetry install --with <group>`
-# inside the running container as a given notebook needs them. #14 replaces
-# this with one multi-stage target per group, pre-installed.
+
+# Internal stage: core Poetry group only, no source copied yet. Every
+# per-group target below builds FROM this, so the (slow, heavy) core install
+# is shared/cached across all of them instead of repeated per group.
+FROM base AS core-deps
 RUN poetry install --no-root
+
+# Default dev target -- notebooks 0-4 and most of the shared helper only
+# need this. `docker-compose.dev.yml` builds this target explicitly.
+FROM core-deps AS core
+COPY . .
+
+# One target per notebook-cluster group (see CLAUDE.md for the
+# group-to-notebook mapping). Each installs on top of the shared core-deps
+# layer, then copies source last so editing a notebook never invalidates
+# the (re-download-heavy) install layer.
+#
+# Known limitation: pyproject.toml/poetry.lock are a single file covering
+# all groups, so Docker's layer cache can't tell "only the geo pin changed"
+# from "the tensorflow pin changed" -- any edit to either file invalidates
+# core-deps (and therefore every group target below) even if a given
+# target's own group didn't change. Accepted tradeoff for a
+# single-maintainer repo rather than splitting into per-group exported
+# requirements files.
+FROM core-deps AS tensorflow-env
+RUN poetry install --no-root --with tensorflow
+COPY . .
+
+FROM core-deps AS nlp-env
+RUN poetry install --no-root --with nlp
+COPY . .
+
+FROM core-deps AS geo-env
+RUN poetry install --no-root --with geo
+COPY . .
+
+FROM core-deps AS bio-env
+RUN poetry install --no-root --with bio
+COPY . .
+
+FROM core-deps AS explain-env
+RUN poetry install --no-root --with explain
 COPY . .
