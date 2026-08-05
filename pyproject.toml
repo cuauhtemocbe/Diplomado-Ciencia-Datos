@@ -51,6 +51,19 @@ google-api-python-client = "^2.143.0"
 flask = "^3.0.3"
 gunicorn = "^23.0.0"
 wordcloud = "^1.9.3"
+# sentence-transformers pulls in torch transitively. The default PyPI
+# `torch` wheel bundles ~18 nvidia-*-cu13 CUDA packages on Linux even
+# though nothing here uses a GPU, ballooning nlp-env to 12GB+ (same class
+# of bug as the xgboost/xgboost-cpu swap above, just much bigger). Pinning
+# torch explicitly to PyTorch's own CPU-only wheel index avoids all of
+# that: verified `import torch` still works, image drops to ~750MB just
+# for torch instead of several GB of CUDA libs.
+torch = { version = "*", source = "pytorch-cpu" }
+
+[[tool.poetry.source]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+priority = "explicit"
 
 [tool.poetry.group.geo]
 optional = true
