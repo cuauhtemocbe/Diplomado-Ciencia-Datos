@@ -65,7 +65,7 @@ Si prefieres usar Visual Studio Code para editar los notebooks, ábrelo directam
 | `bio` | 9-Electrocardiograma | `make jupyter-bio` | 8893 |
 | `explain` | 10-Proyecto-Hipertension-Mexico, 6-Whatsapp | `make jupyter-explain` | 8894 |
 
-Cada grupo también tiene `build-<grupo>`, `up-<grupo>`, `down-<grupo>` y `shell-<grupo>` (por ejemplo `make shell-geo`). Puedes tener varios contenedores corriendo a la vez — cada uno en su propio puerto — así que no hace falta bajar uno para levantar otro. `tensorflow`/`nlp` están definidos pero hoy no se pueden construir (falla la instalación de `torch`); pendiente de una refactorización de esos notebooks.
+Cada grupo también tiene `build-<grupo>`, `up-<grupo>`, `down-<grupo>` y `shell-<grupo>` (por ejemplo `make shell-geo`). Puedes tener varios contenedores corriendo a la vez — cada uno en su propio puerto — así que no hace falta bajar uno para levantar otro.
 
 Para contribuir código a `src/`, `make lint` y `make test` corren pylint/pytest dentro del contenedor con el mismo comando que usa CI, así no hay diferencia entre "pasa en mi máquina" y "pasa en CI".
 

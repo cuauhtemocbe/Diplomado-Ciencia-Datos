@@ -5,10 +5,8 @@
 #   - multiple group containers can run at the same time without port
 #     conflicts (they all get checked while still up, at the end)
 #
-# tensorflow/nlp are skipped by default (SKIP_HEAVY_GROUPS=1, same
-# convention as verify-poetry-groups.sh / verify-dockerfile-targets.sh):
-# the underlying torch install currently fails, deferred pending a
-# notebook dependency-reduction refactor.
+# tensorflow/nlp build and are checked by default; set SKIP_HEAVY_GROUPS=1
+# to skip them for a faster iteration loop (multi-GB downloads).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -19,7 +17,7 @@ TARGET_GROUPS=(core geo bio explain)
 if [ "${SKIP_HEAVY_GROUPS:-}" != "1" ]; then
   TARGET_GROUPS+=(tensorflow nlp)
 else
-  echo "==> Skipping tensorflow/nlp services (SKIP_HEAVY_GROUPS=1) -- torch install currently broken, pending notebook refactor"
+  echo "==> Skipping tensorflow/nlp services (SKIP_HEAVY_GROUPS=1)"
 fi
 
 cleanup() {

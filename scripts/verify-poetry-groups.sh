@@ -8,6 +8,9 @@
 # Each case runs in a fresh python:3.12.6-slim container (matching
 # Dockerfile.dev's base) so the check reflects true install-time isolation,
 # not whatever happens to already be on this machine or in a cached image.
+#
+# tensorflow/nlp build and are checked by default; set SKIP_HEAVY_GROUPS=1
+# to skip them for a faster iteration loop (multi-GB downloads).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -55,7 +58,7 @@ from app_clustering import clustering
 print('nlp group imports OK')
 "
 else
-  echo "==> Skipping tensorflow/nlp (SKIP_HEAVY_GROUPS=1) -- pending notebook refactor, same as dash was"
+  echo "==> Skipping tensorflow/nlp (SKIP_HEAVY_GROUPS=1)"
 fi
 
 run_case "geo" "geo" "

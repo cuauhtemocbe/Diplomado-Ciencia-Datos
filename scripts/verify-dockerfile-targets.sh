@@ -2,14 +2,13 @@
 # Verifies the acceptance criteria from GitHub issue #14:
 #   - `docker build --target core` produces an image under 2GB with
 #     tensorflow/torch/geopandas/dash absent
-#   - geo-env/bio-env/explain-env targets build and satisfy their notebooks'
-#     imports, within a reasonable size bound
+#   - every group target builds and satisfies its notebooks' imports,
+#     within a reasonable size bound
 #   - rebuilding an unchanged target is a cache hit (no reinstall)
 #
-# tensorflow-env/nlp-env are skipped by default (same SKIP_HEAVY_GROUPS
-# convention as verify-poetry-groups.sh): the combined install currently
-# fails on torch, deferred until those notebooks get a dependency-reduction
-# pass. Set SKIP_HEAVY_GROUPS=0 to attempt them anyway.
+# tensorflow-env/nlp-env build and are checked by default; set
+# SKIP_HEAVY_GROUPS=1 to skip them for a faster iteration loop (they pull
+# multi-GB downloads).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -18,6 +17,8 @@ MAX_SIZE_CORE_MB=2048
 MAX_SIZE_GEO_MB=3072
 MAX_SIZE_BIO_MB=2048
 MAX_SIZE_EXPLAIN_MB=2048
+MAX_SIZE_TENSORFLOW_MB=6144
+MAX_SIZE_NLP_MB=3072
 
 image_size_mb() {
   docker image inspect "$1" --format='{{.Size}}' | awk '{printf "%d", $1/1024/1024}'
@@ -106,6 +107,7 @@ print('explain-env target OK')
 if [ "${SKIP_HEAVY_GROUPS:-}" != "1" ]; then
   echo "==> [tensorflow-env]"
   build_target tensorflow-env
+  check_size tensorflow-env "$MAX_SIZE_TENSORFLOW_MB"
   check_imports tensorflow-env "
 import tensorflow, keras, tf_keras
 print('tensorflow-env target OK')
@@ -113,13 +115,15 @@ print('tensorflow-env target OK')
 
   echo "==> [nlp-env]"
   build_target nlp-env
+  check_size nlp-env "$MAX_SIZE_NLP_MB"
   check_imports nlp-env "
-import sentence_transformers, umap, googleapiclient, flask, gunicorn, wordcloud
+import sentence_transformers, umap, googleapiclient, flask, gunicorn, wordcloud, torch
 from app_clustering import clustering
+assert not torch.cuda.is_available(), 'expected the CPU-only torch build'
 print('nlp-env target OK')
 "
 else
-  echo "==> Skipping tensorflow-env/nlp-env (SKIP_HEAVY_GROUPS=1) -- torch install currently broken, pending notebook refactor"
+  echo "==> Skipping tensorflow-env/nlp-env (SKIP_HEAVY_GROUPS=1)"
 fi
 
 echo "All Dockerfile.dev target checks passed."
