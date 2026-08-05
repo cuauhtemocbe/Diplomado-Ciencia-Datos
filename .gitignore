@@ -5,3 +5,5 @@ __pycache__
 poetry.lock
 .ipynb_checkpoints
 notebooks-profesores/
+.claude/
+CLAUDE.md
