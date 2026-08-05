@@ -25,7 +25,13 @@ statsmodels = "^0.14.6"
 # xgboost is unconditionally imported at module level by
 # src/data_analysis_octopus.py (used by roughly half the notebooks), so it
 # can't be an optional group without breaking that shared helper everywhere.
-xgboost = "^2.0.3"
+# Using xgboost-cpu instead of xgboost: same `import xgboost` module (same
+# upstream project, CPU-only build) but the regular `xgboost` PyPI wheel
+# unconditionally pulls in nvidia-nccl-cu12 (a ~1GB CUDA runtime lib) on
+# Linux even when no GPU is used -- xgboost-cpu drops that dependency
+# entirely, which is most of what kept the core image over the #14 2GB
+# budget.
+xgboost-cpu = "^2.1.4"
 
 # Notebook-cluster groups (see CLAUDE.md for the group-to-notebook mapping).
 # Installed on top of the main dependencies above via `poetry install --with <group>`.
