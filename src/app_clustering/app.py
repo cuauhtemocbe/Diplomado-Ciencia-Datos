@@ -17,8 +17,6 @@ app = Flask(__name__)
 app.logger.setLevel(logging.ERROR)
 app.config['PROPAGATE_EXCEPTIONS'] = False
 
-RANDOM_STATE = 333
-
 
 def convert_graph_to_html(graph, full_html=False):
     return pio.to_html(graph, full_html=full_html) if graph else None
@@ -33,62 +31,74 @@ def index():
     image_path = None
     sentiment_daily_graph = None
     sentiment_count = None
+    error = None
 
     if request.method == "POST":
         url = request.form["url"]
         if url:
             video_details = clustering.get_youtube_video_details(url, api_key)
             comments_df = clustering.get_youtube_comments(api_key, url)
-            comments_df = clustering.add_normalized_embeddings_to_dataframe(
-                comments_df, "comment"
-            )
 
-            comments_df["published_at"] = pd.to_datetime(
-                comments_df["published_at"]
-            ).dt.date
+            if video_details.get("error"):
+                error = video_details["error"]
+            elif isinstance(comments_df, dict) and comments_df.get("error"):
+                error = comments_df["error"]
 
-            comments_df = clustering.classify_sentiment_df(comments_df)
-            sentiment_count = comments_df["sentimiento"].value_counts().to_dict()
-            sentiment_daily_graph = clustering.plot_sentiment_daily(comments_df)
+            if error:
+                video_details = None
+            else:
+                comments_df = clustering.add_normalized_embeddings_to_dataframe(
+                    comments_df, "comment"
+                )
 
-            sentiment_daily_graph = convert_graph_to_html(sentiment_daily_graph)
+                comments_df["published_at"] = pd.to_datetime(
+                    comments_df["published_at"]
+                ).dt.date
 
-            umap_df, min_eps, max_eps = clustering.transform_embeddings(
-                comments_df, embeddings_col="embeddings"
-            )
+                comments_df = clustering.classify_sentiment_df(comments_df)
+                sentiment_count = comments_df["sentimiento"].value_counts().to_dict()
+                sentiment_daily_graph = clustering.plot_sentiment_daily(comments_df)
 
-            # image_path = os.path.join(os.getcwd(), "static/wordcloud.png")
-            # print("path", image_path)
+                sentiment_daily_graph = convert_graph_to_html(sentiment_daily_graph)
 
-            total = comments_df.shape[0]
+                umap_df, min_eps, max_eps = clustering.transform_embeddings(
+                    comments_df, embeddings_col="embeddings"
+                )
 
-            min_items_by_cluster = clustering.determine_min_items_by_cluster(total)
+                # image_path = os.path.join(os.getcwd(), "static/wordcloud.png")
+                # print("path", image_path)
 
-            (
-                cluster_assignments,
-                cluster_counts,
-                calinski_harabasz_scores,
-                silhouette_scores,
-                most_similar_comments,
-                umap_df,
-            ) = clustering.perform_clustering(
-                umap_df, min_eps, max_eps, n=10, embeddings_col="embeddings"
-            )
+                total = comments_df.shape[0]
 
-            labels, source, target, values, comments = clustering.build_sankey_data(
-                cluster_assignments,
-                cluster_counts,
-                most_similar_comments,
-                min_items_by_cluster=min_items_by_cluster,
-            )
+                min_items_by_cluster = clustering.determine_min_items_by_cluster(total)
 
-            sankey_graph = clustering.plot_sankey(
-                labels, source, target, values, comments, height=1000, width=1200
-            )
-            sankey_graph = convert_graph_to_html(sankey_graph)
+                (
+                    cluster_assignments,
+                    cluster_counts,
+                    calinski_harabasz_scores,
+                    silhouette_scores,
+                    most_similar_comments,
+                    umap_df,
+                ) = clustering.perform_clustering(
+                    umap_df, min_eps, max_eps, n=10, embeddings_col="embeddings"
+                )
 
-            scores_graph, _ = clustering.plot_clustering_metric(silhouette_scores, calinski_harabasz_scores)
-            scores_graph = convert_graph_to_html(scores_graph)
+                labels, source, target, values, comments = clustering.build_sankey_data(
+                    cluster_assignments,
+                    cluster_counts,
+                    most_similar_comments,
+                    min_items_by_cluster=min_items_by_cluster,
+                )
+
+                sankey_graph = clustering.plot_sankey(
+                    labels, source, target, values, comments, height=1000, width=1200
+                )
+                sankey_graph = convert_graph_to_html(sankey_graph)
+
+                scores_graph, _ = clustering.plot_clustering_metric(
+                    silhouette_scores, calinski_harabasz_scores
+                )
+                scores_graph = convert_graph_to_html(scores_graph)
 
     return render_template(
         "index.html",
@@ -99,6 +109,7 @@ def index():
         wordcloud_path=image_path,
         sentiment_daily_graph=sentiment_daily_graph,
         sentiment_count=sentiment_count,
+        error=error,
     )
 
 

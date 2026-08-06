@@ -1,8 +1,8 @@
 ---
 title: Version poetry.lock for reproducible builds
-status: approved
+status: completed
 created: 2026-08-05
-updated: 2026-08-05
+updated: 2026-08-06
 issue: #4
 ---
 

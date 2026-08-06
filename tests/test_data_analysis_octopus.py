@@ -1,11 +1,10 @@
 """Unit tests for data_analysis_octopus's pure outlier/stats helpers.
 
-Covers detect_outliers_iqr, transform_outliers, process_outliers,
-count_percentage, create_feature_dataframe, and get_information_value (see
-issue #21). These are the module's pure(-ish) functions -- plain
-pandas/numpy in and out, no plotting or IPython side effects -- which makes
-them testable in isolation, unlike DataViz or the sklearn-model-training
-helpers.
+Covers detect_outliers_iqr, transform_outliers, count_percentage,
+create_feature_dataframe, and get_information_value (see issue #21). These
+are the module's pure(-ish) functions -- plain pandas/numpy in and out, no
+plotting or IPython side effects -- which makes them testable in isolation,
+unlike DataViz or the sklearn-model-training helpers.
 
 Note on the IQR-boundary scenario: a value already equal to the clip bound
 is behaviorally indistinguishable, via the returned data, from a value that
@@ -21,25 +20,6 @@ import pandas as pd
 import pytest
 
 import data_analysis_octopus as dao
-
-
-def test_process_outliers_clips_values_above_upper_bound():
-    data = pd.DataFrame({"x": [10, 11, 12, 11, 10, 12, 11, 1000]})
-    _, upper_bound = dao.detect_outliers_iqr(data, "x")
-
-    result = dao.process_outliers(data.copy(), "x")
-
-    assert result["x"].max() == upper_bound
-    assert 1000 not in result["x"].values
-
-
-def test_process_outliers_leaves_values_within_bounds_unchanged():
-    data = pd.DataFrame({"x": [10, 11, 12, 11, 10, 12, 11, 1000]})
-    original_inliers = data["x"].iloc[:-1].tolist()
-
-    result = dao.process_outliers(data.copy(), "x")
-
-    assert result["x"].iloc[:-1].tolist() == original_inliers
 
 
 def test_detect_outliers_iqr_handles_zero_variance_column_without_raising():

@@ -9,12 +9,8 @@ import collections
 from datetime import datetime
 from typing import List, Tuple, TypeAlias, Union
 
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
-import seaborn as sns
 from IPython.display import clear_output, display
 from scipy.sparse import csr_matrix
 from sklearn import metrics
@@ -36,7 +32,7 @@ from sklearn.tree import DecisionTreeClassifier
 from varclushi import VarClusHi
 from xgboost import XGBClassifier
 
-from .viz import DataViz
+from .viz import DataViz, heatmap, plot_heatmap_clusters
 
 ModelClassifier: TypeAlias = Union[
     SVC,
@@ -131,24 +127,6 @@ def transform_outliers(data, column, lower_bound, upper_bound):
     """
     data.loc[data[column] < lower_bound, column] = lower_bound
     data.loc[data[column] > upper_bound, column] = upper_bound
-    return data
-
-
-def process_outliers(data, column):
-    """
-    Procesa los valores atípicos en una columna de un DataFrame, detectándolos y ajustándolos dentro de los límites calculados
-    utilizando el método del rango intercuartílico (IQR).
-
-    Parámetros:
-    data (DataFrame): El DataFrame que contiene los datos.
-    column (str): El nombre de la columna en la que se van a procesar los valores atípicos.
-
-    Retorna:
-    DataFrame: El DataFrame con los valores atípicos transformados dentro de los límites especificados.
-    """
-    lower_bound, upper_bound = detect_outliers_iqr(data, column)
-    data = transform_outliers(data, column, lower_bound, upper_bound)
-
     return data
 
 
@@ -701,42 +679,6 @@ def update_progress(progress, progress_text=""):
     print(ouput_text)
 
 
-def heatmap(
-    data, title="Mapa de Calor", width=800, height=600, cell_width=30, cell_height=30
-):
-    # Calcular tamaño de la figura basado en el tamaño deseado de cada celda
-    fig_width = cell_width * data.shape[1]
-    fig_height = cell_height * data.shape[0]
-
-    # Crear el mapa de calor
-    fig = px.imshow(data, title=title, color_continuous_scale="RdBu_r")
-
-    # Añadir anotaciones en un solo paso
-    annotations = []
-    for i in range(data.shape[0]):
-        for j in range(data.shape[1]):
-            annotations.append(
-                go.layout.Annotation(
-                    x=j,
-                    y=i,
-                    text=round(data.iloc[i, j]),
-                    font=dict(size=8, color="white"),
-                    showarrow=False,
-                    align="center",
-                )
-            )
-
-    fig.update_layout(
-        annotations=annotations,
-        xaxis=dict(tickangle=45),
-        width=fig_width,
-        height=fig_height,
-        margin=dict(l=0, r=0, t=50, b=0),
-    )
-
-    fig.show()
-
-
 def reduce_cardinality(df, col, threshold=0.1):
     # Calcular la frecuencia de cada categoría en la columna especificada
     # `value_counts(normalize=True)` devuelve la proporción de cada categoría en lugar del conteo absoluto
@@ -753,22 +695,3 @@ def reduce_cardinality(df, col, threshold=0.1):
     df[col] = df[col].apply(lambda x: "Otros" if x in low_freq_categories else x)
 
     return df
-
-
-def plot_heatmap_clusters(
-    df, cluster_col="cluster", agg_func="median", annot_fontsize=8, figsize=(12, 2)
-):
-    scaler = MinMaxScaler()
-    scaled_df = scaler.fit_transform(df.drop(columns=[cluster_col]))
-    scaled_df[cluster_col] = df[cluster_col]
-    aggregated_cluster = scaled_df.groupby(cluster_col).agg(agg_func).round(2)
-    plt.figure(figsize=figsize)
-    sns.heatmap(
-        aggregated_cluster,
-        annot=True,
-        cmap="viridis",
-        fmt=".2f",
-        annot_kws={"size": annot_fontsize},
-    )
-    plt.title(f"Mapa de Calor de '{agg_func}' de Características por Clúster")
-    plt.show()

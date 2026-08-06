@@ -2,7 +2,7 @@
 
 Espacio para subir las actividades realizadas durante el diplomado de Ciencia de Datos 2024-2025. 
 
-Este repositorio utiliza Docker para configurar un entorno de Python 3.12.3 orientado a **Ciencia de Datos** con Jupyter, facilitando la gestión de bibliotecas mediante Poetry.
+Este repositorio utiliza Docker para configurar un entorno de Python 3.13 orientado a **Ciencia de Datos** con Jupyter, facilitando la gestión de bibliotecas mediante Poetry.
 
 ## Requisitos Previos
 

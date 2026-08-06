@@ -1,8 +1,12 @@
-"""Regression tests for the DataViz extraction (see issue #22).
+"""Regression tests for the DataViz extraction (see issue #22) and the
+heatmap/plot_heatmap_clusters move (see issue #34).
 
 data_analysis_octopus was split into a package (__init__.py + viz.py) with
 DataViz moved into viz.py and re-exported from __init__.py, so every
-existing notebook import style keeps resolving to the same class.
+existing notebook import style keeps resolving to the same class. heatmap
+and plot_heatmap_clusters -- visualization code left behind in __init__.py
+after the DataViz split -- were later moved into viz.py the same way, since
+notebooks/15-AirBnb.ipynb still calls them via dao.heatmap/dao.plot_heatmap_clusters.
 """
 
 import data_analysis_octopus as dao
@@ -41,3 +45,13 @@ def test_non_plotting_helpers_still_import_and_are_unaffected_by_the_split():
     assert callable(dao.detect_outliers_iqr)
     assert callable(dao.count_percentage)
     assert callable(dao.train_classifier_model)
+
+
+def test_heatmap_and_plot_heatmap_clusters_importable_from_their_own_submodule():
+    assert hasattr(viz, "heatmap")
+    assert hasattr(viz, "plot_heatmap_clusters")
+
+
+def test_namespaced_import_resolves_heatmap_functions_to_the_viz_submodule():
+    assert dao.heatmap is viz.heatmap
+    assert dao.plot_heatmap_clusters is viz.plot_heatmap_clusters

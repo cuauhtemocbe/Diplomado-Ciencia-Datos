@@ -7,7 +7,10 @@ smallest safe slice to split out (see issue #22).
 
 import matplotlib.pyplot as plt
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import seaborn as sns
+from sklearn.preprocessing import MinMaxScaler
 
 
 class DataViz:
@@ -196,3 +199,58 @@ class DataViz:
         sns.heatmap(data=correl)
         plt.tight_layout()
         plt.show()
+
+
+def heatmap(
+    data, title="Mapa de Calor", width=800, height=600, cell_width=30, cell_height=30
+):
+    # Calcular tamaño de la figura basado en el tamaño deseado de cada celda
+    fig_width = cell_width * data.shape[1]
+    fig_height = cell_height * data.shape[0]
+
+    # Crear el mapa de calor
+    fig = px.imshow(data, title=title, color_continuous_scale="RdBu_r")
+
+    # Añadir anotaciones en un solo paso
+    annotations = []
+    for i in range(data.shape[0]):
+        for j in range(data.shape[1]):
+            annotations.append(
+                go.layout.Annotation(
+                    x=j,
+                    y=i,
+                    text=round(data.iloc[i, j]),
+                    font=dict(size=8, color="white"),
+                    showarrow=False,
+                    align="center",
+                )
+            )
+
+    fig.update_layout(
+        annotations=annotations,
+        xaxis=dict(tickangle=45),
+        width=fig_width,
+        height=fig_height,
+        margin=dict(l=0, r=0, t=50, b=0),
+    )
+
+    fig.show()
+
+
+def plot_heatmap_clusters(
+    df, cluster_col="cluster", agg_func="median", annot_fontsize=8, figsize=(12, 2)
+):
+    scaler = MinMaxScaler()
+    scaled_df = scaler.fit_transform(df.drop(columns=[cluster_col]))
+    scaled_df[cluster_col] = df[cluster_col]
+    aggregated_cluster = scaled_df.groupby(cluster_col).agg(agg_func).round(2)
+    plt.figure(figsize=figsize)
+    sns.heatmap(
+        aggregated_cluster,
+        annot=True,
+        cmap="viridis",
+        fmt=".2f",
+        annot_kws={"size": annot_fontsize},
+    )
+    plt.title(f"Mapa de Calor de '{agg_func}' de Características por Clúster")
+    plt.show()

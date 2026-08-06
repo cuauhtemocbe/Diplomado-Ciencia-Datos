@@ -1,8 +1,8 @@
 ---
 title: data_analysis_octopus notebook-import hygiene, test coverage, and module split
-status: approved
+status: completed
 created: 2026-08-05
-updated: 2026-08-05
+updated: 2026-08-06
 issue: #19, #21, #22
 ---
 

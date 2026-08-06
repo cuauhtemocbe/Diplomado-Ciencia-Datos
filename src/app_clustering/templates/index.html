@@ -40,6 +40,12 @@
             <input type="text" id="url" name="url" required>
             <button type="submit">Analizar</button>
         </form>
+        {% if error %}
+            <div class="video-details">
+                <h2>Error</h2>
+                <p>{{ error }}</p>
+            </div>
+        {% endif %}
         {% if video_details %}
             <div class="video-details">
                 <h2>Detalles del Video</h2>

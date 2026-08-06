@@ -18,7 +18,6 @@ from sklearn.metrics import (
     pairwise_distances,
     silhouette_score,
 )
-from sklearn.neighbors import NearestNeighbors
 from sklearn.preprocessing import normalize
 from transformers import pipeline
 from wordcloud import WordCloud
@@ -27,8 +26,6 @@ if os.getenv("RAILWAY_ENVIRONMENT") is None:
     load_dotenv()
 
 api_key = os.getenv("youtube_api_key")
-
-RANDOM_STATE = 333
 
 stopwords_es = [
     "a",
@@ -268,45 +265,26 @@ def get_youtube_comments(api_key, url, max_results=100):
     - max_results: int, el número máximo de comentarios a obtener por solicitud (predeterminado es 100).
 
     Retorna:
-    - df: pandas DataFrame, contiene los comentarios del video.
+    - df: pandas DataFrame con los comentarios del video, o un diccionario
+      {"error": str} si la solicitud a la API falla (clave inválida,
+      comentarios deshabilitados, cuota agotada, etc.).
     """
+    try:
+        # Crear el servicio de la API de YouTube
+        youtube = build("youtube", "v3", developerKey=api_key)
 
-    # Crear el servicio de la API de YouTube
-    youtube = build("youtube", "v3", developerKey=api_key)
-
-    # Solicitar los comentarios del video
-    video_id = extract_video_id(url)
-    request = youtube.commentThreads().list(
-        part="snippet", videoId=video_id, maxResults=max_results
-    )
-
-    response = request.execute()
-
-    # Lista para almacenar los datos de los comentarios
-    comments_data = []
-
-    # Procesar y almacenar los comentarios en la lista
-    for item in response["items"]:
-        comment = item["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
-        author = item["snippet"]["topLevelComment"]["snippet"]["authorDisplayName"]
-        published_at = item["snippet"]["topLevelComment"]["snippet"]["publishedAt"]
-
-        comments_data.append(
-            {"author": author, "comment": comment, "published_at": published_at}
-        )
-
-    # Paginar y obtener más comentarios si hay más disponibles
-    next_page_token = response.get("nextPageToken")
-
-    while next_page_token:
+        # Solicitar los comentarios del video
+        video_id = extract_video_id(url)
         request = youtube.commentThreads().list(
-            part="snippet",
-            videoId=video_id,
-            pageToken=next_page_token,
-            maxResults=max_results,
+            part="snippet", videoId=video_id, maxResults=max_results
         )
+
         response = request.execute()
 
+        # Lista para almacenar los datos de los comentarios
+        comments_data = []
+
+        # Procesar y almacenar los comentarios en la lista
         for item in response["items"]:
             comment = item["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
             author = item["snippet"]["topLevelComment"]["snippet"]["authorDisplayName"]
@@ -316,12 +294,39 @@ def get_youtube_comments(api_key, url, max_results=100):
                 {"author": author, "comment": comment, "published_at": published_at}
             )
 
+        # Paginar y obtener más comentarios si hay más disponibles
         next_page_token = response.get("nextPageToken")
 
-    # Convertir la lista de comentarios en un DataFrame de pandas
-    df = pd.DataFrame(comments_data)
+        while next_page_token:
+            request = youtube.commentThreads().list(
+                part="snippet",
+                videoId=video_id,
+                pageToken=next_page_token,
+                maxResults=max_results,
+            )
+            response = request.execute()
 
-    return df
+            for item in response["items"]:
+                comment = item["snippet"]["topLevelComment"]["snippet"]["textDisplay"]
+                author = item["snippet"]["topLevelComment"]["snippet"][
+                    "authorDisplayName"
+                ]
+                published_at = item["snippet"]["topLevelComment"]["snippet"][
+                    "publishedAt"
+                ]
+
+                comments_data.append(
+                    {"author": author, "comment": comment, "published_at": published_at}
+                )
+
+            next_page_token = response.get("nextPageToken")
+
+        # Convertir la lista de comentarios en un DataFrame de pandas
+        df = pd.DataFrame(comments_data)
+
+        return df
+    except Exception as e:
+        return {"error": str(e)}
 
 
 def add_normalized_embeddings_to_dataframe(
@@ -347,42 +352,6 @@ def add_normalized_embeddings_to_dataframe(
     data["embeddings"] = [embedding for embedding in normalized_embeddings]
 
     return data
-
-
-def plot_k_distance(data, threshold=0.01, quantile=0.95):
-    # embeddings_matrix = np.array(data["embeddings"].tolist())
-    embeddings_matrix = data.copy()
-
-    for thresh in [threshold, 0.05, 0.1, 0.2]:
-        min_samples = int(round(data.shape[0] * thresh, 0))
-        n_neighbors = min_samples - 1
-
-        if n_neighbors > 2:
-            nn = NearestNeighbors(
-                n_neighbors=n_neighbors, algorithm="auto", metric="cosine", n_jobs=-1
-            )
-            nn.fit(embeddings_matrix)
-            distances, _ = nn.kneighbors(embeddings_matrix)
-            k_distances = distances[:, -1]
-            min_eps = np.percentile(k_distances, quantile * 100)
-            k_distances = np.sort(k_distances)
-            fig = go.Figure()
-            fig.add_trace(go.Scatter(y=k_distances, mode="lines", name="k-distances"))
-            fig.add_hline(
-                y=min_eps,
-                line=dict(color="red", dash="dash"),
-                name=f"min_eps = {min_eps:.2f}",
-            )
-            fig.update_layout(
-                title="k-Distance Graph",
-                xaxis_title="Index",
-                yaxis_title="Distance",
-                width=800,
-                height=600,
-                template="plotly_dark",
-            )
-            return fig, min_eps
-    return None, None
 
 
 def find_most_similar_comment(cluster_data, avg_embedding):

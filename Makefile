@@ -4,7 +4,7 @@ COMPOSE := docker compose -f docker-compose.dev.yml
 SERVICE := diplomado-core
 JUPYTER_CMD := jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --allow-root --NotebookApp.token=''
 
-.PHONY: help build up down shell jupyter lint test \
+.PHONY: help build up down shell jupyter lint test test-nlp \
 	verify-build verify-groups verify-dockerfile verify-compose \
 	jupyter-local lint-local test-local \
 	build-core up-core down-core shell-core jupyter-core \
@@ -35,6 +35,9 @@ lint: up-core ## Correr pylint dentro del contenedor (mismo comando que CI)
 
 test: up-core ## Correr pytest dentro del contenedor
 	$(COMPOSE) exec $(SERVICE) poetry run pytest tests -v
+
+test-nlp: up-nlp ## Correr pytest dentro del contenedor nlp (necesario para tests de app_clustering: flask, google-api-python-client)
+	$(COMPOSE) exec diplomado-nlp poetry run pytest tests -v
 
 verify-build: ## Validar contexto de build, cache de poetry install y ausencia de .env en la imagen (issue #12)
 	./scripts/verify-build-context.sh
