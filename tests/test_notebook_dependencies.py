@@ -21,9 +21,9 @@ import pytest
 
 NOTEBOOK_DEPENDENCIES = [
     ("0-Hello-Pandas", ["pandas"]),
-    ("1-Ecobici-análisis", ["pandas", "bs4"]),
+    ("1-Ecobici-análisis", ["data_analysis_octopus", "pandas", "bs4"]),
     ("2-Cardiotocography", ["pandas", "data_analysis_octopus"]),
-    ("3-Starbucks", ["ipywidgets", "scipy", "numpy", "pandas", "plotly", "seaborn"]),
+    ("3-Starbucks", ["data_analysis_octopus", "ipywidgets", "scipy", "numpy", "pandas", "plotly", "seaborn"]),
     (
         "4-Restaurantes",
         [
@@ -189,6 +189,7 @@ NOTEBOOK_DEPENDENCIES = [
     (
         "Predicción_precios_casas_CNN",
         [
+            "data_analysis_octopus",
             "IPython",
             "PIL",
             "cv2",
