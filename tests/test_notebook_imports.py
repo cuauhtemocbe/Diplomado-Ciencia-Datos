@@ -62,7 +62,6 @@ CONVERTED_NOTEBOOKS = [
 # issue #33: only the sys.path.append hack was in scope for these two).
 SYS_PATH_APPEND_FREE_NOTEBOOKS = [
     "2-Cardiotocography",
-    "4-Restaurantes",
     "5-Regresiones",
 ]
 
