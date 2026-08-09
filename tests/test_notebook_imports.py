@@ -45,10 +45,13 @@ SRC_PATH = (
 
 CONVERTED_NOTEBOOKS = [
     "2-Cardiotocography",
+    "3-Starbucks",
     "6-Whatsapp",
     "7-Clasificación-clientes",
     "9-Electrocardiograma",
     "10-Proyecto-Hipertension-Mexico",
+    "12-Ataque-corazon",
+    "15-AirBnb",
 ]
 
 # Full top-to-bottom execution is verified for these two (matches issue

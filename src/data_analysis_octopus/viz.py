@@ -146,20 +146,24 @@ class DataViz:
                 plt.show()
 
     @staticmethod
-    def densidad(data: pd.DataFrame, columnas: list) -> None:
+    def densidad(data: pd.DataFrame, columnas: list, hue=None) -> None:
         """
         Genera un gráfico de densidad de las columnas especificadas de un DataFrame,
 
         Parámetros:
         data (pd.DataFrame): El DataFrame que contiene los datos.
         columnas (list): Una lista de nombres de columnas continuas para las cuales se generarán los gráficos.
+        hue (str, optional): Columna que identifica las clases para dibujar curvas separadas.
 
         Retorna:
         Visualiza el gráfico de cada columna del argumento columnas
         """
         for column in columnas:
             fig, axs = plt.subplots(1, 1, figsize=(15, 5))
-            sns.kdeplot(data=data, x=column)
+            if hue is None:
+                sns.kdeplot(data=data, x=column)
+            else:
+                sns.kdeplot(data=data, x=column, hue=hue)
             plt.tight_layout()
             plt.show()
 

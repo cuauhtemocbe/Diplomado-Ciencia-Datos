@@ -9,6 +9,8 @@ after the DataViz split -- were later moved into viz.py the same way, since
 notebooks/15-AirBnb.ipynb still calls them via dao.heatmap/dao.plot_heatmap_clusters.
 """
 
+import pandas as pd
+
 import data_analysis_octopus as dao
 from data_analysis_octopus import viz
 
@@ -55,3 +57,26 @@ def test_heatmap_and_plot_heatmap_clusters_importable_from_their_own_submodule()
 def test_namespaced_import_resolves_heatmap_functions_to_the_viz_submodule():
     assert dao.heatmap is viz.heatmap
     assert dao.plot_heatmap_clusters is viz.plot_heatmap_clusters
+
+
+def test_densidad_preserves_no_hue_call_shape(monkeypatch):
+    calls = []
+    monkeypatch.setattr(viz.sns, "kdeplot", lambda **kwargs: calls.append(kwargs))
+    monkeypatch.setattr(viz.plt, "show", lambda: None)
+
+    dao.DataViz.densidad(pd.DataFrame({"value": [1, 2, 3]}), ["value"])
+
+    assert len(calls) == 1
+    assert calls[0]["x"] == "value"
+    assert calls[0]["data"]["value"].tolist() == [1, 2, 3]
+
+
+def test_densidad_passes_hue_to_seaborn(monkeypatch):
+    calls = []
+    monkeypatch.setattr(viz.sns, "kdeplot", lambda **kwargs: calls.append(kwargs))
+    monkeypatch.setattr(viz.plt, "show", lambda: None)
+    data = pd.DataFrame({"value": [1, 2, 3, 4], "target": [0, 1, 0, 1]})
+
+    dao.DataViz.densidad(data, ["value"], hue="target")
+
+    assert calls == [{"data": data, "x": "value", "hue": "target"}]
