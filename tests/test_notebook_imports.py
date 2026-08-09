@@ -48,10 +48,30 @@ CONVERTED_NOTEBOOKS = [
     "3-Starbucks",
     "6-Whatsapp",
     "7-Clasificación-clientes",
+    "8-Clasificación-cáncer",
     "9-Electrocardiograma",
     "10-Proyecto-Hipertension-Mexico",
     "12-Ataque-corazon",
     "15-AirBnb",
+]
+
+# These notebooks never used `from data_analysis_octopus import *` -- they
+# already named the specific functions/classes they need. That's a valid,
+# non-wildcard style, just not the `dao.`-prefixed one, so they're out of
+# scope for CONVERTED_NOTEBOOKS' wildcard/dangling-reference checks (see
+# issue #33: only the sys.path.append hack was in scope for these two).
+SYS_PATH_APPEND_FREE_NOTEBOOKS = [
+    "2-Cardiotocography",
+    "4-Restaurantes",
+    "5-Regresiones",
+]
+
+# Notebooks required to use the single, consistent `import
+# data_analysis_octopus as dao` alias (issue #33 / #19's stated goal).
+DAO_ALIAS_NOTEBOOKS = [
+    "2-Cardiotocography",
+    "15-AirBnb",
+    "8-Clasificación-cáncer",
 ]
 
 # Full top-to-bottom execution is verified for these two (matches issue
@@ -201,6 +221,71 @@ def test_no_dangling_bare_reference(notebook):
             f"definition"
         )
         resolved = effective
+
+
+def _contains_sys_path_append(source):
+    try:
+        tree = ast.parse(source)
+    except SyntaxError:
+        cleaned = "\n".join(
+            l for l in source.splitlines() if not l.strip().startswith(("%", "!"))
+        )
+        tree = ast.parse(cleaned)
+    for node in ast.walk(tree):
+        if (
+            isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Attribute)
+            and node.func.attr == "append"
+            and isinstance(node.func.value, ast.Attribute)
+            and node.func.value.attr == "path"
+        ):
+            return True
+    return False
+
+
+@pytest.mark.parametrize("notebook", SYS_PATH_APPEND_FREE_NOTEBOOKS)
+def test_no_sys_path_append(notebook):
+    for cell_source in _code_cells(notebook):
+        assert not _contains_sys_path_append(cell_source), (
+            f"{notebook} still has a sys.path.append call -- Dockerfile.dev "
+            f"already sets PYTHONPATH to include src"
+        )
+
+
+def test_airbnb_has_no_bootstrap_cell():
+    for cell_source in _code_cells("15-AirBnb"):
+        assert "!wget" not in cell_source, (
+            "15-AirBnb still fetches data_analysis_octopus.py via wget; "
+            "the module is preinstalled in the image"
+        )
+        for package in ("varclushi", "phik", "yellowbrick"):
+            assert f"!pip install {package}" not in cell_source, (
+                f"15-AirBnb still has a redundant '!pip install {package}' "
+                f"cell; it's already pinned in pyproject.toml"
+            )
+
+
+@pytest.mark.parametrize("notebook", DAO_ALIAS_NOTEBOOKS)
+def test_uses_consistent_dao_alias(notebook):
+    statements = []
+    for cell_source in _code_cells(notebook):
+        statements.extend(_import_statements(cell_source))
+    assert statements == ["import data_analysis_octopus as dao"], (
+        f"{notebook} should import data_analysis_octopus exactly once as "
+        f"dao, with no separate tuple import; found {statements}"
+    )
+
+
+def test_whatsapp_has_no_dead_import():
+    statements = []
+    for cell_source in _code_cells("6-Whatsapp"):
+        statements.extend(_import_statements(cell_source))
+    if statements:
+        all_source = "\n".join(_code_cells("6-Whatsapp"))
+        assert "dao." in all_source, (
+            "6-Whatsapp imports data_analysis_octopus but never references "
+            "dao -- either use it or remove the import"
+        )
 
 
 # 9-Electrocardiograma reads from data/electrocardiograma/, which has never
