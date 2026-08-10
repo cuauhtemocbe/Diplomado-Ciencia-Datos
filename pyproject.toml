@@ -31,7 +31,7 @@ statsmodels = "^0.14.6"
 # Linux even when no GPU is used -- xgboost-cpu drops that dependency
 # entirely, which is most of what kept the core image over the #14 2GB
 # budget.
-xgboost-cpu = "^2.1.4"
+xgboost-cpu = ">=2.1.4,<4.0.0"
 
 # Notebook-cluster groups (see CLAUDE.md for the group-to-notebook mapping).
 # Installed on top of the main dependencies above via `poetry install --with <group>`.
