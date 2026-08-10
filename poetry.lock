@@ -6513,15 +6513,17 @@ dev = ["pytest", "setuptools"]
 
 [[package]]
 name = "xgboost-cpu"
-version = "2.1.4"
+version = "3.4.0"
 description = "XGBoost Python Package"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "xgboost_cpu-2.1.4-py3-none-manylinux2014_aarch64.whl", hash = "sha256:f2eb1997a490789a9866abad46179e0a4e1ea01c1673cb5b586b630dc6b18232"},
-    {file = "xgboost_cpu-2.1.4-py3-none-manylinux2014_x86_64.whl", hash = "sha256:ac3281127b2f77f6c62e8699216b0974a1c4a442ee6162eb94256c01df7cd1f5"},
-    {file = "xgboost_cpu-2.1.4-py3-none-win_amd64.whl", hash = "sha256:5bd5017085fcf1756306eadd6548973a8ef05f18ad2eec529f5b54c00843cecf"},
+    {file = "xgboost_cpu-3.4.0-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:454eb0cac636cc34714e3bc92d9eb25f172ca0f971cdaaf658fa40e3324eb063"},
+    {file = "xgboost_cpu-3.4.0-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:9818d48e5277527015419073a418a76c99cf5b094dbf1287533ea6a9f0b86301"},
+    {file = "xgboost_cpu-3.4.0-py3-none-win_amd64.whl", hash = "sha256:45ab4ec708617ba4144ac821ca34a3a54648fe7e43e909dfcefaedd9f697b65d"},
+    {file = "xgboost_cpu-3.4.0-py3-none-win_arm64.whl", hash = "sha256:3d6f202b79edb8c9a2067fcb61022995a02208e070a1333ebd85967fd6b60595"},
+    {file = "xgboost_cpu-3.4.0.tar.gz", hash = "sha256:d65e8045f25e28f631da33ac5a51e305937bb81e3911ac9141823dbc4da1a0bb"},
 ]
 
 [package.dependencies]
@@ -6530,10 +6532,9 @@ scipy = "*"
 
 [package.extras]
 dask = ["dask", "distributed", "pandas"]
-datatable = ["datatable"]
 pandas = ["pandas (>=1.2)"]
 plotting = ["graphviz", "matplotlib"]
-pyspark = ["cloudpickle", "pyspark", "scikit-learn"]
+pyspark = ["cloudpickle", "pyspark (>=4.0)", "scikit-learn"]
 scikit-learn = ["scikit-learn"]
 
 [[package]]
@@ -6677,4 +6678,4 @@ scipy = ">=1.0.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "efd8ca0a38fdb27e81255a8f175989589b693805fd5c50200e826f3504dcf899"
+content-hash = "89169c665167ec08a6b12e5c80ce85aac7d0173aeff7d5c3e5e574af33a54b86"
