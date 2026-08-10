@@ -16,6 +16,7 @@ Two layers:
 
 from unittest.mock import patch
 
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import pytest
@@ -215,3 +216,48 @@ def test_index_renders_results_on_success(client, monkeypatch):
     assert b"Detalles del Video" in response.data
     assert b"Gr\xc3\xa1fico de Sankey" in response.data
     assert b"<h2>Error</h2>" not in response.data
+
+
+def test_add_normalized_embeddings_uses_sentence_transformer_api(monkeypatch):
+    encoded_sentences = []
+
+    class FakeSentenceTransformer:
+        def __init__(self, model_name):
+            assert model_name == "test-model"
+
+        def encode(self, sentences):
+            encoded_sentences.extend(sentences)
+            return np.array([[3.0, 4.0], [0.0, 2.0]])
+
+    monkeypatch.setattr(clustering, "SentenceTransformer", FakeSentenceTransformer)
+    data = pd.DataFrame({"comment": ["hola", "adios"]})
+
+    result = clustering.add_normalized_embeddings_to_dataframe(
+        data, "comment", model_name="test-model"
+    )
+
+    assert encoded_sentences == ["hola", "adios"]
+    np.testing.assert_allclose(
+        np.array(result["embeddings"].tolist()),
+        np.array([[0.6, 0.8], [0.0, 1.0]]),
+    )
+
+
+def test_classify_sentiment_df_maps_labels_and_scores(monkeypatch):
+    def fake_classifier(text):
+        return [
+            {
+                "label": "5 stars" if text == "bien" else "1 star",
+                "score": 0.95 if text == "bien" else 0.88,
+            }
+        ]
+
+    monkeypatch.setattr(clustering, "classifier", fake_classifier)
+    data = pd.DataFrame({"comment": ["bien", "mal"]})
+
+    result = clustering.classify_sentiment_df(data)
+
+    assert result[["sentimiento", "confianza"]].to_dict("records") == [
+        {"sentimiento": "positivo", "confianza": 0.95},
+        {"sentimiento": "negativo", "confianza": 0.88},
+    ]
