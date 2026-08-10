@@ -221,7 +221,7 @@ def test_index_renders_results_on_success(client, monkeypatch):
 def test_add_normalized_embeddings_uses_sentence_transformer_api(monkeypatch):
     encoded_sentences = []
 
-    class FakeSentenceTransformer:
+    class FakeSentenceTransformer:  # pylint: disable=too-few-public-methods
         def __init__(self, model_name):
             assert model_name == "test-model"
 
