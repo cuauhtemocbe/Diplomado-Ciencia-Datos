@@ -83,7 +83,7 @@ optional = true
 # shap 0.46.0 has no cp313 wheel and fails to compile from source (no C++
 # toolchain in the image, see Dockerfile.dev). 0.48.0 is the oldest
 # release that ships a cp313 wheel -- see issue #23.
-shap = "^0.48.0"
+shap = ">=0.48,<0.53"
 nltk = "^3.8.1"
 
 [tool.poetry.group.dev.dependencies]
