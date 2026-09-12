@@ -21,7 +21,7 @@ cufflinks = "^0.17.3"
 unidecode = "^1.3.8"
 phik = "^0.12.4"
 yellowbrick = "^1.5"
-statsmodels = "^0.14.6"
+statsmodels = ">=0.14.6,<0.16.0"
 # xgboost is unconditionally imported at module level by
 # src/data_analysis_octopus.py (used by roughly half the notebooks), so it
 # can't be an optional group without breaking that shared helper everywhere.
@@ -83,7 +83,7 @@ optional = true
 # shap 0.46.0 has no cp313 wheel and fails to compile from source (no C++
 # toolchain in the image, see Dockerfile.dev). 0.48.0 is the oldest
 # release that ships a cp313 wheel -- see issue #23.
-shap = "^0.48.0"
+shap = ">=0.48,<0.53"
 nltk = "^3.8.1"
 
 [tool.poetry.group.dev.dependencies]
