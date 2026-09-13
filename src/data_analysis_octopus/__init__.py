@@ -21,8 +21,7 @@ from sklearn.feature_selection import RFECV, SelectKBest, f_regression
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import classification_report, f1_score, roc_auc_score
-from sklearn.model_selection import (GridSearchCV, StratifiedKFold,
-                                     cross_val_score)
+from sklearn.model_selection import GridSearchCV, StratifiedKFold, cross_val_score
 from sklearn.naive_bayes import ComplementNB, GaussianNB, MultinomialNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.pipeline import Pipeline

@@ -15,7 +15,7 @@ api_key = os.getenv("youtube_api_key")
 
 app = Flask(__name__)
 app.logger.setLevel(logging.ERROR)
-app.config['PROPAGATE_EXCEPTIONS'] = False
+app.config["PROPAGATE_EXCEPTIONS"] = False
 
 
 def convert_graph_to_html(graph, full_html=False):

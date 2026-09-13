@@ -38,7 +38,9 @@ def test_get_youtube_comments_returns_error_dict_on_api_failure():
             "invalidKey"
         )
 
-        result = clustering.get_youtube_comments("bad-key", "https://youtu.be/dQw4w9WgXcQ")
+        result = clustering.get_youtube_comments(
+            "bad-key", "https://youtu.be/dQw4w9WgXcQ"
+        )
 
     assert isinstance(result, dict)
     assert "invalidKey" in result["error"]
@@ -66,7 +68,9 @@ def test_get_youtube_comments_returns_dataframe_on_success():
             mock_response
         )
 
-        result = clustering.get_youtube_comments("good-key", "https://youtu.be/dQw4w9WgXcQ")
+        result = clustering.get_youtube_comments(
+            "good-key", "https://youtu.be/dQw4w9WgXcQ"
+        )
 
     assert isinstance(result, pd.DataFrame)
     assert result.iloc[0]["comment"] == "great video"
@@ -81,11 +85,18 @@ def client_fixture():
     return app_module.app.test_client()
 
 
-def test_index_shows_error_when_comments_fetch_fails_invalid_api_key(client, monkeypatch):
+def test_index_shows_error_when_comments_fetch_fails_invalid_api_key(
+    client, monkeypatch
+):
     monkeypatch.setattr(
         app_module.clustering,
         "get_youtube_video_details",
-        lambda url, api_key: {"title": "t", "channel_title": "c", "view_count": "1", "comment_count": "1"},
+        lambda url, api_key: {
+            "title": "t",
+            "channel_title": "c",
+            "view_count": "1",
+            "comment_count": "1",
+        },
     )
     monkeypatch.setattr(
         app_module.clustering,
@@ -104,12 +115,19 @@ def test_index_shows_error_when_comments_disabled(client, monkeypatch):
     monkeypatch.setattr(
         app_module.clustering,
         "get_youtube_video_details",
-        lambda url, api_key: {"title": "t", "channel_title": "c", "view_count": "1", "comment_count": "1"},
+        lambda url, api_key: {
+            "title": "t",
+            "channel_title": "c",
+            "view_count": "1",
+            "comment_count": "1",
+        },
     )
     monkeypatch.setattr(
         app_module.clustering,
         "get_youtube_comments",
-        lambda api_key, url: {"error": "commentsDisabled: comments are disabled for this video"},
+        lambda api_key, url: {
+            "error": "commentsDisabled: comments are disabled for this video"
+        },
     )
 
     response = client.post("/", data={"url": "https://youtu.be/dQw4w9WgXcQ"})
@@ -122,7 +140,12 @@ def test_index_shows_error_on_quota_exceeded(client, monkeypatch):
     monkeypatch.setattr(
         app_module.clustering,
         "get_youtube_video_details",
-        lambda url, api_key: {"title": "t", "channel_title": "c", "view_count": "1", "comment_count": "1"},
+        lambda url, api_key: {
+            "title": "t",
+            "channel_title": "c",
+            "view_count": "1",
+            "comment_count": "1",
+        },
     )
     monkeypatch.setattr(
         app_module.clustering,
@@ -140,13 +163,19 @@ def test_index_shows_error_when_video_details_fetch_fails(client, monkeypatch):
     monkeypatch.setattr(
         app_module.clustering,
         "get_youtube_video_details",
-        lambda url, api_key: {"error": "No se encontró el video con el ID proporcionado."},
+        lambda url, api_key: {
+            "error": "No se encontró el video con el ID proporcionado."
+        },
     )
     monkeypatch.setattr(
         app_module.clustering,
         "get_youtube_comments",
         lambda api_key, url: pd.DataFrame(
-            {"author": ["a"], "comment": ["hola"], "published_at": ["2024-01-01T00:00:00Z"]}
+            {
+                "author": ["a"],
+                "comment": ["hola"],
+                "published_at": ["2024-01-01T00:00:00Z"],
+            }
         ),
     )
 
@@ -161,13 +190,22 @@ def test_index_renders_results_on_success(client, monkeypatch):
     monkeypatch.setattr(
         app_module.clustering,
         "get_youtube_video_details",
-        lambda url, api_key: {"title": "t", "channel_title": "c", "view_count": "1", "comment_count": "1"},
+        lambda url, api_key: {
+            "title": "t",
+            "channel_title": "c",
+            "view_count": "1",
+            "comment_count": "1",
+        },
     )
     monkeypatch.setattr(
         app_module.clustering,
         "get_youtube_comments",
         lambda api_key, url: pd.DataFrame(
-            {"author": ["a"], "comment": ["hola"], "published_at": ["2024-01-01T00:00:00Z"]}
+            {
+                "author": ["a"],
+                "comment": ["hola"],
+                "published_at": ["2024-01-01T00:00:00Z"],
+            }
         ),
     )
     monkeypatch.setattr(
@@ -198,7 +236,14 @@ def test_index_renders_results_on_success(client, monkeypatch):
     monkeypatch.setattr(
         app_module.clustering,
         "perform_clustering",
-        lambda umap_df, min_eps, max_eps, n, embeddings_col: ({}, {}, {}, {}, {}, umap_df),
+        lambda umap_df, min_eps, max_eps, n, embeddings_col: (
+            {},
+            {},
+            {},
+            {},
+            {},
+            umap_df,
+        ),
     )
     monkeypatch.setattr(
         app_module.clustering,
