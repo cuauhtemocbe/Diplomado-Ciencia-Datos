@@ -67,7 +67,7 @@ Si prefieres usar Visual Studio Code para editar los notebooks, ábrelo directam
 
 Cada grupo también tiene `build-<grupo>`, `up-<grupo>`, `down-<grupo>` y `shell-<grupo>` (por ejemplo `make shell-geo`). Puedes tener varios contenedores corriendo a la vez — cada uno en su propio puerto — así que no hace falta bajar uno para levantar otro.
 
-Para contribuir código a `src/`, `make lint` y `make test` corren pylint/pytest dentro del contenedor con el mismo comando que usa CI, así no hay diferencia entre "pasa en mi máquina" y "pasa en CI".
+Para contribuir código a `src/`, `make lint` y `make test` corren pylint/pytest dentro del contenedor **core** con el mismo comando que usa CI, así no hay diferencia entre "pasa en mi máquina" y "pasa en CI". `make test` no instala el grupo `nlp`, así que los tests de `app_clustering` (que necesitan flask) se reportan como *skipped* en vez de fallar por import; usa `make test-nlp` para correrlos de verdad dentro del contenedor **nlp**. CI también corre `poetry run black --check` y `poetry run isort --check-only` sobre los mismos archivos que pylint — usa `make lint` (o `poetry run black .` / `poetry run isort .` dentro del contenedor) para formatear antes de subir.
 
 ## Enlaces de Interés
 
