@@ -101,6 +101,12 @@ pylint = ">=3.2,<5.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.isort]
+# Without this, isort's own line-wrapping style for multi-import
+# statements (see sklearn imports in clustering.py) disagrees with black's
+# magic-trailing-comma style, so the two tools fight over the same lines.
+profile = "black"
+
 [tool.pylint.main]
 # Matches pytest's own pythonpath config (see [tool.pytest.ini_options]
 # below) — without this, pylint can't resolve `from app_clustering import
