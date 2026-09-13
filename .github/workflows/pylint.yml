@@ -28,3 +28,7 @@ jobs:
     - name: Analysing the code with pylint
       run: |
         poetry run pylint $(git ls-files '*.py')
+    - name: Checking formatting with black
+      run: poetry run black --check $(git ls-files '*.py')
+    - name: Checking import order with isort
+      run: poetry run isort --check-only $(git ls-files '*.py')

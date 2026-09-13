@@ -30,8 +30,10 @@ shell: shell-core ## Abrir una shell dentro del contenedor de desarrollo (alias 
 jupyter: jupyter-core ## Iniciar Jupyter Lab dentro del contenedor (alias de jupyter-core)
 
 # Debe coincidir con .github/workflows/pylint.yml — si cambia ahí, cambiar acá también.
-lint: up-core ## Correr pylint dentro del contenedor (mismo comando que CI)
+lint: up-core ## Correr pylint, black --check e isort --check-only dentro del contenedor (mismo comando que CI)
 	$(COMPOSE) exec $(SERVICE) poetry run pylint $$(git ls-files '*.py')
+	$(COMPOSE) exec $(SERVICE) poetry run black --check $$(git ls-files '*.py')
+	$(COMPOSE) exec $(SERVICE) poetry run isort --check-only $$(git ls-files '*.py')
 
 test: up-core ## Correr pytest dentro del contenedor
 	$(COMPOSE) exec $(SERVICE) poetry run pytest tests -v
@@ -54,8 +56,10 @@ verify-compose: ## Validar que cada servicio de docker-compose construye e inici
 jupyter-local: ## Iniciar Jupyter Lab con Poetry, sin Docker
 	poetry run jupyter lab --ip=0.0.0.0 --port=8888 --no-browser --NotebookApp.token=''
 
-lint-local: ## Correr pylint con Poetry, sin Docker
+lint-local: ## Correr pylint, black --check e isort --check-only con Poetry, sin Docker
 	poetry run pylint $$(git ls-files '*.py')
+	poetry run black --check $$(git ls-files '*.py')
+	poetry run isort --check-only $$(git ls-files '*.py')
 
 test-local: ## Correr pytest con Poetry, sin Docker
 	poetry run pytest tests -v
