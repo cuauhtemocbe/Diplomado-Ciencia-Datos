@@ -6667,15 +6667,17 @@ dev = ["pytest", "setuptools"]
 
 [[package]]
 name = "xgboost-cpu"
-version = "2.1.4"
+version = "3.4.1"
 description = "XGBoost Python Package"
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.12"
 groups = ["main"]
 files = [
-    {file = "xgboost_cpu-2.1.4-py3-none-manylinux2014_aarch64.whl", hash = "sha256:f2eb1997a490789a9866abad46179e0a4e1ea01c1673cb5b586b630dc6b18232"},
-    {file = "xgboost_cpu-2.1.4-py3-none-manylinux2014_x86_64.whl", hash = "sha256:ac3281127b2f77f6c62e8699216b0974a1c4a442ee6162eb94256c01df7cd1f5"},
-    {file = "xgboost_cpu-2.1.4-py3-none-win_amd64.whl", hash = "sha256:5bd5017085fcf1756306eadd6548973a8ef05f18ad2eec529f5b54c00843cecf"},
+    {file = "xgboost_cpu-3.4.1-py3-none-manylinux_2_28_aarch64.whl", hash = "sha256:47b81860b18056f9425b34fe2905343bc7ee0118122ae09cf2e31c305ed49877"},
+    {file = "xgboost_cpu-3.4.1-py3-none-manylinux_2_28_x86_64.whl", hash = "sha256:1f16331f5c6beb2b40fbd4bf2834333062d93c9eb38b76186a5c206841dc1809"},
+    {file = "xgboost_cpu-3.4.1-py3-none-win_amd64.whl", hash = "sha256:ceb0f7c786511e1876df6ca83a6f837a3187159bde51d8dcc5cdf5e2de76e366"},
+    {file = "xgboost_cpu-3.4.1-py3-none-win_arm64.whl", hash = "sha256:24347f435ba6e9919c9102684f8b353bf43d9951184ef0e71b148673ed14306d"},
+    {file = "xgboost_cpu-3.4.1.tar.gz", hash = "sha256:ee0b249eaa962837cdc4e67adfec54567bfe7386337f3c3a3ce5d68909492e81"},
 ]
 
 [package.dependencies]
@@ -6684,10 +6686,9 @@ scipy = "*"
 
 [package.extras]
 dask = ["dask", "distributed", "pandas"]
-datatable = ["datatable"]
 pandas = ["pandas (>=1.2)"]
 plotting = ["graphviz", "matplotlib"]
-pyspark = ["cloudpickle", "pyspark", "scikit-learn"]
+pyspark = ["cloudpickle", "pyspark (>=4.0)", "scikit-learn"]
 scikit-learn = ["scikit-learn"]
 
 [[package]]
@@ -6831,4 +6832,4 @@ scipy = ">=1.0.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "46d2cf00f74f2b30136d786fad67aa055e508f15400df0b3150bfbbb813654af"
+content-hash = "ad739c4d23dbb6f46891ab4d6ac59ace9c0cad17ebd176a4525120c7a4d58d85"
