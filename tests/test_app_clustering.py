@@ -21,9 +21,13 @@ import pandas as pd
 import plotly.graph_objects as go
 import pytest
 
+pytest.importorskip("flask", reason="app_clustering needs 'flask', not installed here")
+
+# pylint: disable=wrong-import-position
 from app_clustering import app as app_module
 from app_clustering import clustering
 
+# pylint: enable=wrong-import-position
 
 # --- get_youtube_comments unit tests ---------------------------------------
 
