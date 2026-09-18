@@ -69,6 +69,16 @@ Cada grupo también tiene `build-<grupo>`, `up-<grupo>`, `down-<grupo>` y `shell
 
 Para contribuir código a `src/`, `make lint` y `make test` corren pylint/pytest dentro del contenedor **core** con el mismo comando que usa CI, así no hay diferencia entre "pasa en mi máquina" y "pasa en CI". `make test` no instala el grupo `nlp`, así que los tests de `app_clustering` (que necesitan flask) se reportan como *skipped* en vez de fallar por import; usa `make test-nlp` para correrlos de verdad dentro del contenedor **nlp**. CI también corre `poetry run black --check` y `poetry run isort --check-only` sobre los mismos archivos que pylint — usa `make lint` (o `poetry run black .` / `poetry run isort .` dentro del contenedor) para formatear antes de subir.
 
+### Hook de pre-push con Trivy (activación única)
+
+El repositorio incluye un hook de `pre-push` en `.githooks/` que corre [Trivy](https://trivy.dev/) sobre las dependencias (`poetry.lock`) y bloquea el `git push` si encuentra una vulnerabilidad **CRITICAL** con corrección disponible. La activación es manual y se hace una sola vez por clone — no ocurre automáticamente al clonar:
+
+```bash
+./scripts/install-hooks.sh
+```
+
+Este script configura `core.hooksPath` a `.githooks`. A diferencia del resto del flujo, el hook corre en tu máquina (no dentro de Docker), así que necesitas tener `trivy` instalado y en el `PATH`; si no lo encuentra, el push se bloquea con un mensaje que apunta a las instrucciones de instalación en [`.claude/skills/trivy-scan/setup.md`](.claude/skills/trivy-scan/setup.md).
+
 ## Enlaces de Interés
 
 - **Poetry**: [Sitio oficial de Poetry](https://python-poetry.org/)
