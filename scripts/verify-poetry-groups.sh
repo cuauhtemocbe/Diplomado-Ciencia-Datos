@@ -5,7 +5,7 @@
 #   - each optional group, installed on top of core, satisfies its notebooks' imports
 #   - src/data_analysis_octopus.py (shared helper) only needs core
 #
-# Each case runs in a fresh python:3.12.6-slim container (matching
+# Each case runs in a fresh python:3.14-slim container (matching
 # Dockerfile.dev's base) so the check reflects true install-time isolation,
 # not whatever happens to already be on this machine or in a cached image.
 #
@@ -20,7 +20,7 @@ run_case() {
   echo "==> [$name] poetry install --no-root ${with_flag:+--with $with_flag}"
   if docker run --rm -v "$(pwd):/workspace:ro" -w /tmp/build \
       -e PYTHONPATH=/tmp/build/src \
-      python:3.12.6-slim bash -euc "
+      python:3.14-slim bash -euc "
         cp /workspace/pyproject.toml /workspace/poetry.lock .
         cp -r /workspace/src .
         pip install -q poetry
