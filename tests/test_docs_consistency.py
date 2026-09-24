@@ -11,6 +11,7 @@ import re
 from pathlib import Path
 
 import yaml
+from packaging.specifiers import SpecifierSet
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
@@ -47,8 +48,17 @@ def test_readme_python_version_matches_dockerfile():
 
 
 def test_pyproject_python_constraint_permits_dockerfile_version():
-    python_version = _dockerfile_python_version()
+    # Every base image in Dockerfile.dev must be installable, not just the
+    # first one: tensorflow-env is held on an older Python than the rest.
+    dockerfile = (REPO_ROOT / "Dockerfile.dev").read_text(encoding="utf-8")
+    python_versions = set(re.findall(r"FROM python:(\d+\.\d+)-slim", dockerfile))
     pyproject = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    match = re.search(r'^python = "\^(\d+\.\d+)"', pyproject, re.MULTILINE)
+    match = re.search(r'^python = "([^"]+)"', pyproject, re.MULTILINE)
     assert match, "pyproject.toml's python constraint didn't match the expected pattern"
-    assert match.group(1) == python_version
+    constraint = match.group(1)
+    caret = re.fullmatch(r"\^(\d+)\.(\d+)", constraint)
+    if caret:
+        constraint = f">={caret[1]}.{caret[2]},<{int(caret[1]) + 1}.0"
+    assert python_versions
+    for python_version in python_versions:
+        assert SpecifierSet(constraint).contains(python_version), python_version

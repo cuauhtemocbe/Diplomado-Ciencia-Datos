@@ -2,7 +2,7 @@
 
 Espacio para subir las actividades realizadas durante el diplomado de Ciencia de Datos 2024-2025. 
 
-Este repositorio utiliza Docker para configurar un entorno de Python 3.14 orientado a **Ciencia de Datos** con Jupyter, facilitando la gestión de bibliotecas mediante Poetry.
+Este repositorio utiliza Docker para configurar un entorno de Python 3.14 orientado a **Ciencia de Datos** con Jupyter, facilitando la gestión de bibliotecas mediante Poetry. La única excepción es la imagen del grupo `tensorflow`, que usa Python 3.13 porque tensorflow aún no publica una versión estable con wheels para 3.14.
 
 ## Requisitos Previos
 

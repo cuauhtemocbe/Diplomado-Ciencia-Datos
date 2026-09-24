@@ -263,7 +263,10 @@ files = [
 ]
 
 [package.dependencies]
-cffi = {version = ">=2.0.0b1", markers = "python_version >= \"3.14\""}
+cffi = [
+    {version = ">=1.0.1", markers = "python_version < \"3.14\""},
+    {version = ">=2.0.0b1", markers = "python_version >= \"3.14\""},
+]
 
 [[package]]
 name = "arrow"
@@ -1499,7 +1502,10 @@ files = [
 ]
 
 [package.dependencies]
-cryptography = {version = ">=41.0.5", markers = "python_version >= \"3.14\""}
+cryptography = [
+    {version = ">=38.0.3", markers = "python_version < \"3.14\""},
+    {version = ">=41.0.5", markers = "python_version >= \"3.14\""},
+]
 pyasn1-modules = ">=0.2.1"
 
 [package.extras]
@@ -6800,5 +6806,5 @@ scipy = ">=1.0.0"
 
 [metadata]
 lock-version = "2.1"
-python-versions = "^3.14"
-content-hash = "16d229ac6b61700199ac5aea9357174abfd7bec57357205ec169e954f9af0783"
+python-versions = ">=3.13,<4.0"
+content-hash = "55dce647a017aa16d40005c65c1e00344a6fd98bd96f07a42f1b186900b14395"

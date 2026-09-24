@@ -1,3 +1,8 @@
+# Every target runs on python:3.14-slim except tensorflow-env, which is held
+# on python:3.13-slim: tensorflow has no stable cp314 wheel yet (2.21.0
+# ships cp310-cp313 only; cp314 exists only as a 2.22 pre-release). Drop the
+# separate base-tensorflow/core-deps-tensorflow stages below once a stable
+# tensorflow release ships cp314 wheels.
 FROM python:3.14-slim AS base
 RUN mkdir workspace
 WORKDIR /workspace
@@ -9,10 +14,27 @@ RUN poetry config virtualenvs.create false
 ENV PYTHONPATH=/workspace/src:${PYTHONPATH}
 COPY pyproject.toml poetry.lock ./
 
+# Same steps as base, on the tensorflow-compatible interpreter.
+FROM python:3.13-slim AS base-tensorflow
+RUN mkdir workspace
+WORKDIR /workspace
+RUN apt-get update && \
+    apt-get install -y git && \
+    apt-get clean
+RUN pip install "poetry"
+RUN poetry config virtualenvs.create false
+ENV PYTHONPATH=/workspace/src:${PYTHONPATH}
+COPY pyproject.toml poetry.lock ./
+
 # Internal stage: core Poetry group only, no source copied yet. Every
-# per-group target below builds FROM this, so the (slow, heavy) core install
-# is shared/cached across all of them instead of repeated per group.
+# per-group target below except tensorflow-env builds FROM this, so the
+# (slow, heavy) core install is shared/cached across all of them instead of
+# repeated per group.
 FROM base AS core-deps
+RUN poetry install --no-root
+
+# core-deps on python:3.13-slim, used only by tensorflow-env.
+FROM base-tensorflow AS core-deps-tensorflow
 RUN poetry install --no-root
 
 # Default dev target -- notebooks 0-4 and most of the shared helper only
@@ -32,7 +54,7 @@ COPY . .
 # target's own group didn't change. Accepted tradeoff for a
 # single-maintainer repo rather than splitting into per-group exported
 # requirements files.
-FROM core-deps AS tensorflow-env
+FROM core-deps-tensorflow AS tensorflow-env
 RUN poetry install --no-root --with tensorflow
 COPY . .
 

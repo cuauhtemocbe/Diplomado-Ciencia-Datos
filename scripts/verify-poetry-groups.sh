@@ -8,19 +8,25 @@
 # Each case runs in a fresh python:3.14-slim container (matching
 # Dockerfile.dev's base) so the check reflects true install-time isolation,
 # not whatever happens to already be on this machine or in a cached image.
+# The tensorflow case runs on python:3.13-slim instead, matching
+# Dockerfile.dev's tensorflow-env target (no stable cp314 tensorflow wheel
+# yet).
 #
 # tensorflow/nlp build and are checked by default; set SKIP_HEAVY_GROUPS=1
 # to skip them for a faster iteration loop (multi-GB downloads).
 set -euo pipefail
 
+PYTHON_IMAGE="python:3.14-slim"
+TENSORFLOW_PYTHON_IMAGE="python:3.13-slim"
+
 cd "$(dirname "$0")/.."
 
 run_case() {
-  local name="$1" with_flag="$2" import_check="$3"
-  echo "==> [$name] poetry install --no-root ${with_flag:+--with $with_flag}"
+  local name="$1" with_flag="$2" import_check="$3" image="${4:-$PYTHON_IMAGE}"
+  echo "==> [$name] ($image) poetry install --no-root ${with_flag:+--with $with_flag}"
   if docker run --rm -v "$(pwd):/workspace:ro" -w /tmp/build \
       -e PYTHONPATH=/tmp/build/src \
-      python:3.14-slim bash -euc "
+      "$image" bash -euc "
         cp /workspace/pyproject.toml /workspace/poetry.lock .
         cp -r /workspace/src .
         pip install -q poetry
@@ -50,7 +56,7 @@ if [ "${SKIP_HEAVY_GROUPS:-}" != "1" ]; then
   run_case "tensorflow" "tensorflow" "
 import tensorflow, keras, tf_keras, h5py
 print('tensorflow group imports OK')
-"
+" "$TENSORFLOW_PYTHON_IMAGE"
 
   run_case "nlp" "nlp" "
 import sentence_transformers, umap, googleapiclient, flask, gunicorn, wordcloud, transformers
