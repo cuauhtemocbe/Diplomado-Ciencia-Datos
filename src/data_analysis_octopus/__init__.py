@@ -1,5 +1,5 @@
 """
-El modulo sirve para analizar la completitud de un conjunto de datos y 
+El modulo sirve para analizar la completitud de un conjunto de datos y
 realizar gráficas por tipo de variable (Discretas y continuas)
 """
 
