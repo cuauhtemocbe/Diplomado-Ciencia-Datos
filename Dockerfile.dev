@@ -7,7 +7,7 @@
 # Both base images are pinned by exact patch tag + digest, the same way as
 # production images (meta-projects#92); bumping CPython is a search-and-replace
 # of these two strings.
-FROM python:3.14.10-slim-trixie@sha256:9aaa474097d094040649f2162a627c0049b408f52138d980916788d80f04802f AS base
+FROM python:3.15.0-slim-trixie@sha256:f5b92f2a669a4c347044f29367f31983280b648250ca94dea66f98c53bc87e58 AS base
 RUN mkdir workspace
 WORKDIR /workspace
 RUN apt-get update && \
@@ -19,7 +19,7 @@ ENV PYTHONPATH=/workspace/src:${PYTHONPATH}
 COPY pyproject.toml poetry.lock ./
 
 # Same steps as base, on the tensorflow-compatible interpreter.
-FROM python:3.13.18-slim-trixie@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90 AS base-tensorflow
+FROM python:3.15.0-slim-trixie@sha256:f5b92f2a669a4c347044f29367f31983280b648250ca94dea66f98c53bc87e58 AS base-tensorflow
 RUN mkdir workspace
 WORKDIR /workspace
 RUN apt-get update && \
