@@ -75,7 +75,7 @@ pyproj = "^3.6.1"
 optional = true
 [tool.poetry.group.bio.dependencies]
 wfdb = "^4.1.2"
-neurokit2 = "^0.2.9"
+neurokit2 = ">=0.2.9,<0.4.0"
 
 [tool.poetry.group.explain]
 optional = true
