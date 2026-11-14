@@ -36,7 +36,7 @@ def test_poetry_lock_versioning_spec_is_marked_completed():
 
 def _dockerfile_python_version():
     dockerfile = (REPO_ROOT / "Dockerfile.dev").read_text(encoding="utf-8")
-    match = re.search(r"FROM python:(\d+\.\d+)-slim", dockerfile)
+    match = re.search(r"FROM python:(\d+\.\d+)(?:\.\d+)?-slim", dockerfile)
     assert match, "Dockerfile.dev's base image line didn't match the expected pattern"
     return match.group(1)
 
@@ -51,7 +51,9 @@ def test_pyproject_python_constraint_permits_dockerfile_version():
     # Every base image in Dockerfile.dev must be installable, not just the
     # first one: tensorflow-env is held on an older Python than the rest.
     dockerfile = (REPO_ROOT / "Dockerfile.dev").read_text(encoding="utf-8")
-    python_versions = set(re.findall(r"FROM python:(\d+\.\d+)-slim", dockerfile))
+    python_versions = set(
+        re.findall(r"FROM python:(\d+\.\d+)(?:\.\d+)?-slim", dockerfile)
+    )
     pyproject = (REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8")
     match = re.search(r'^python = "([^"]+)"', pyproject, re.MULTILINE)
     assert match, "pyproject.toml's python constraint didn't match the expected pattern"

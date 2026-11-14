@@ -1,9 +1,13 @@
-# Every target runs on python:3.14-slim except tensorflow-env, which is held
-# on python:3.13-slim: tensorflow has no stable cp314 wheel yet (2.21.0
-# ships cp310-cp313 only; cp314 exists only as a 2.22 pre-release). Drop the
+# Every target runs on Python 3.14 except tensorflow-env, which is held on
+# Python 3.13: tensorflow has no stable cp314 wheel yet (2.21.0 ships
+# cp310-cp313 only; cp314 exists only as a 2.22 pre-release). Drop the
 # separate base-tensorflow/core-deps-tensorflow stages below once a stable
 # tensorflow release ships cp314 wheels.
-FROM python:3.14-slim AS base
+#
+# Both base images are pinned by exact patch tag + digest, the same way as
+# production images (meta-projects#92); bumping CPython is a search-and-replace
+# of these two strings.
+FROM python:3.14.10-slim-trixie@sha256:9aaa474097d094040649f2162a627c0049b408f52138d980916788d80f04802f AS base
 RUN mkdir workspace
 WORKDIR /workspace
 RUN apt-get update && \
@@ -15,7 +19,7 @@ ENV PYTHONPATH=/workspace/src:${PYTHONPATH}
 COPY pyproject.toml poetry.lock ./
 
 # Same steps as base, on the tensorflow-compatible interpreter.
-FROM python:3.13-slim AS base-tensorflow
+FROM python:3.13.18-slim-trixie@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90 AS base-tensorflow
 RUN mkdir workspace
 WORKDIR /workspace
 RUN apt-get update && \
@@ -33,7 +37,7 @@ COPY pyproject.toml poetry.lock ./
 FROM base AS core-deps
 RUN poetry install --no-root
 
-# core-deps on python:3.13-slim, used only by tensorflow-env.
+# core-deps on the Python 3.13 base, used only by tensorflow-env.
 FROM base-tensorflow AS core-deps-tensorflow
 RUN poetry install --no-root
 

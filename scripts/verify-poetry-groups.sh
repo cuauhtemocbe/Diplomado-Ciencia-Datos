@@ -5,19 +5,19 @@
 #   - each optional group, installed on top of core, satisfies its notebooks' imports
 #   - src/data_analysis_octopus.py (shared helper) only needs core
 #
-# Each case runs in a fresh python:3.14-slim container (matching
-# Dockerfile.dev's base) so the check reflects true install-time isolation,
-# not whatever happens to already be on this machine or in a cached image.
-# The tensorflow case runs on python:3.13-slim instead, matching
-# Dockerfile.dev's tensorflow-env target (no stable cp314 tensorflow wheel
-# yet).
+# Each case runs in a fresh container on the same pinned Python 3.14 image as
+# Dockerfile.dev's base (patch tag + digest) so the check reflects true
+# install-time isolation, not whatever happens to already be on this machine
+# or in a cached image. The tensorflow case runs on the pinned Python 3.13
+# image instead, matching Dockerfile.dev's tensorflow-env target (no stable
+# cp314 tensorflow wheel yet). Keep both strings identical to Dockerfile.dev's.
 #
 # tensorflow/nlp build and are checked by default; set SKIP_HEAVY_GROUPS=1
 # to skip them for a faster iteration loop (multi-GB downloads).
 set -euo pipefail
 
-PYTHON_IMAGE="python:3.14-slim"
-TENSORFLOW_PYTHON_IMAGE="python:3.13-slim"
+PYTHON_IMAGE="python:3.14.10-slim-trixie@sha256:9aaa474097d094040649f2162a627c0049b408f52138d980916788d80f04802f"
+TENSORFLOW_PYTHON_IMAGE="python:3.13.18-slim-trixie@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90"
 
 cd "$(dirname "$0")/.."
 
