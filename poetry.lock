@@ -1531,14 +1531,14 @@ grpc = ["grpcio (>=1.41.0,<2.0.0)", "grpcio (>=1.49.1,<2.0.0) ; python_version >
 
 [[package]]
 name = "google-api-python-client"
-version = "2.201.0"
+version = "2.202.0"
 description = "Google API Client Library for Python"
 optional = false
 python-versions = ">=3.10"
 groups = ["nlp"]
 files = [
-    {file = "google_api_python_client-2.201.0-py3-none-any.whl", hash = "sha256:2d9bf1ba3f12eee8ed3d0f1791ce0605d163432f496baa72d3677faa2cf097d6"},
-    {file = "google_api_python_client-2.201.0.tar.gz", hash = "sha256:d5691982abd7287f53cb0b0e0c6a9984d4103cf864ea0a88cb6e4347bbaf70de"},
+    {file = "google_api_python_client-2.202.0-py3-none-any.whl", hash = "sha256:aaa90064c9bb642ff1d065b22ca8958a2cb6e345909cefe70d0e5452fc50e08b"},
+    {file = "google_api_python_client-2.202.0.tar.gz", hash = "sha256:ae126c8e91f43c331e23dbd83bc4a8075699dd48089cebc7295f6ab2f5850fc5"},
 ]
 
 [package.dependencies]
@@ -4429,14 +4429,14 @@ testutils = ["gitpython (>3)"]
 
 [[package]]
 name = "pynndescent"
-version = "0.6.0"
+version = "0.7.0"
 description = "Nearest Neighbor Descent"
 optional = false
 python-versions = "*"
 groups = ["nlp"]
 files = [
-    {file = "pynndescent-0.6.0-py3-none-any.whl", hash = "sha256:dc8c74844e4c7f5cbd1e0cd6909da86fdc789e6ff4997336e344779c3d5538ef"},
-    {file = "pynndescent-0.6.0.tar.gz", hash = "sha256:7ffde0fb5b400741e055a9f7d377e3702e02250616834231f6c209e39aac24f5"},
+    {file = "pynndescent-0.7.0-py3-none-any.whl", hash = "sha256:05592399f5fbf07d77590f532ed2a2e3b035ec066813eb5a097632b9ffb9e938"},
+    {file = "pynndescent-0.7.0.tar.gz", hash = "sha256:54f097a003bfdb917225e1bcf55c4027e283a37a2b5e3cae4b4aaf21197f6d1c"},
 ]
 
 [package.dependencies]
@@ -4445,9 +4445,6 @@ llvmlite = ">=0.38"
 numba = ">=0.55.0"
 scikit-learn = ">=0.18"
 scipy = ">=1.0"
-
-[package.extras]
-testing = ["pytest"]
 
 [[package]]
 name = "pyogrio"
@@ -4596,14 +4593,14 @@ dev = ["argcomplete", "asynctest ; python_version < \"3.11\"", "attrs (>=23.1)",
 
 [[package]]
 name = "pytest-asyncio"
-version = "1.4.1.post1"
+version = "1.5.0"
 description = "Pytest support for asyncio"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pytest_asyncio-1.4.1.post1-py3-none-any.whl", hash = "sha256:0755e488cc0a2b9bd2eab7292cc6390d4cbb8390f1020745647bae5a708e0165"},
-    {file = "pytest_asyncio-1.4.1.post1.tar.gz", hash = "sha256:f582d9ea4a1c082195abe8bd29a1fe106aeb1cd435e3dad2d3bc2749935c36a2"},
+    {file = "pytest_asyncio-1.5.0-py3-none-any.whl", hash = "sha256:557f255ee03cc84f84a8d5f438bc9c6e0f714bf86970ae743c7ecb5a38d7e07d"},
+    {file = "pytest_asyncio-1.5.0.tar.gz", hash = "sha256:92c8fa83ca419fd0d4bd6a34df6520dae435841d3733c319343249492adf37f7"},
 ]
 
 [package.dependencies]
@@ -5562,14 +5559,14 @@ test = ["pytest (>=8)"]
 
 [[package]]
 name = "sentence-transformers"
-version = "6.2.0"
+version = "6.3.0"
 description = "Embeddings, Retrieval, and Reranking"
 optional = false
 python-versions = ">=3.10"
 groups = ["nlp"]
 files = [
-    {file = "sentence_transformers-6.2.0-py3-none-any.whl", hash = "sha256:ffb51ccfef65427cfa61776d0eeeb257600b0099cf0c7533ae9a6856d31e4665"},
-    {file = "sentence_transformers-6.2.0.tar.gz", hash = "sha256:1e3cd8796ab7bcad4cfa2f51e2083d8b37b15d6b68e6fa6b91a147c67380574d"},
+    {file = "sentence_transformers-6.3.0-py3-none-any.whl", hash = "sha256:fb89d876edb6cb3a82b7a90f74bd7eb1118412ffabe56b249bd1884d35e705db"},
+    {file = "sentence_transformers-6.3.0.tar.gz", hash = "sha256:a19acbf76a958817136ee4e89f90b483255d77f3dc9a7309814f7600592c450e"},
 ]
 
 [package.dependencies]
@@ -5587,6 +5584,7 @@ typing_extensions = ">=4.10.0"
 audio = ["transformers[audio]"]
 dev = ["accelerate (>=1.3.0)", "datasets (>=2.16.0)", "faiss-cpu", "fastcluster (>=1.2.0)", "peft", "pre-commit", "pytest (>=8.2)", "pytest-cov", "pytest-env", "pytest-subtests", "pytest-xdist", "transformers[audio,video,vision]", "usearch"]
 image = ["transformers[vision]"]
+kernels = ["transformers[kernels] (>=5.20.0)"]
 merge = ["mergekit (>=0.1.5)"]
 onnx = ["optimum-onnx[onnxruntime]"]
 onnx-gpu = ["optimum-onnx[onnxruntime-gpu]"]
@@ -6363,27 +6361,28 @@ markers = {main = "sys_platform == \"win32\" or sys_platform == \"emscripten\"",
 
 [[package]]
 name = "umap-learn"
-version = "0.5.12"
+version = "0.6.0"
 description = "Uniform Manifold Approximation and Projection"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["nlp"]
 files = [
-    {file = "umap_learn-0.5.12-py3-none-any.whl", hash = "sha256:f2a85d2a2adcb52b541bed9b27a23ca169b56bb1b23283abeebfb8dfb8a42fe5"},
-    {file = "umap_learn-0.5.12.tar.gz", hash = "sha256:6aff02ecac5f2aad9f3c65ee518d7ae93e1a985ae38721fdcffceee4232c33c7"},
+    {file = "umap_learn-0.6.0-py3-none-any.whl", hash = "sha256:31f0f6ab31e95463a33404b5228921d24f4314f1607c9db405446ab0fad23663"},
+    {file = "umap_learn-0.6.0.tar.gz", hash = "sha256:2f56945fdf8470efc12dc79c91d8a091a33d1e03ea3251d76e019da8e3617c38"},
 ]
 
 [package.dependencies]
-numba = ">=0.51.2"
-numpy = ">=1.23"
-pynndescent = ">=0.5"
+numba = ">=0.60"
+numpy = ">=2.0"
+pynndescent = ">=0.7"
 scikit-learn = ">=1.6"
-scipy = ">=1.3.1"
+scipy = ">=1.13"
 tqdm = "*"
 
 [package.extras]
 parametric-umap = ["tensorflow (>=2.1)"]
 plot = ["bokeh", "colorcet", "dask", "datashader", "holoviews", "matplotlib", "pandas", "scikit-image", "seaborn"]
+rinnd = ["rinnd (>=0.3.1)"]
 tbb = ["tbb (>=2019.0)"]
 test = ["pytest"]
 
@@ -6960,4 +6959,4 @@ scipy = ">=1.0.0"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<4.0"
-content-hash = "c04b26e666c2cab9d240c01490bb3f46eb11f2ea076b9f7373e5ea6a3649352c"
+content-hash = "ee69445c6b3f63694e08ce3111499f2ecebb7f1604e50ff333b949812eff09f4"
